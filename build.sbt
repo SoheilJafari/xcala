@@ -2,11 +2,11 @@ name := """xcala.play"""
 
 organization := "com.xcala"
 
-version := "0.5-SNAPSHOT"
+version := "0.6-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
-scalaVersion := "2.12.13"
+scalaVersion := "2.12.15"
 
 resolvers ++= Seq(
   "Atlassian Releases" at "https://maven.atlassian.com/public/",
