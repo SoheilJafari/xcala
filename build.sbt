@@ -37,13 +37,12 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-slf4j" % "2.6.19",
   "com.sksamuel.scrimage" %% "scrimage-core" % "2.1.8",
   "com.bahmanm" %% "persianutils" % "4.0",
-  "io.lemonlabs" %% "scala-uri" % "4.0.2",
+  "io.lemonlabs" %% "scala-uri" % "2.3.1",
   specs2 % Test
 )
 
-includeFilter in (Assets, LessKeys.less) := "*.less"
-
-excludeFilter in (Assets, LessKeys.less) := "_*.less"
+Assets / LessKeys.less / includeFilter := "*.less"
+Assets / LessKeys.less / excludeFilter := "_*.less"
 
 pipelineStages := Seq(gzip)
 
