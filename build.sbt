@@ -2,7 +2,7 @@ name := """xcala.play"""
 
 organization := "com.xcala"
 
-version := "1.1.1"
+version := "1.1.2"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
@@ -34,11 +34,11 @@ libraryDependencies ++=
     jodaForms,
     "org.reactivemongo"            %% "reactivemongo"              % "1.0.10",
     "com.nappin"                   %% "play-recaptcha"             % "2.6",
-    "com.typesafe.akka"            %% "akka-actor-typed"           % "2.9.2",
-    "com.typesafe.akka"            %% "akka-testkit"               % "2.9.2" % "test",
-    "com.typesafe.akka"            %% "akka-serialization-jackson" % "2.9.2",
-    "com.typesafe.akka"            %% "akka-stream"                % "2.9.2",
-    "com.typesafe.akka"            %% "akka-slf4j"                 % "2.9.2",
+    "com.typesafe.akka"            %% "akka-actor-typed"           % "2.8.5",
+    "com.typesafe.akka"            %% "akka-testkit"               % "2.8.5" % "test",
+    "com.typesafe.akka"            %% "akka-serialization-jackson" % "2.8.5",
+    "com.typesafe.akka"            %% "akka-stream"                % "2.8.5",
+    "com.typesafe.akka"            %% "akka-slf4j"                 % "2.8.5",
     "com.bahmanm"                  %% "persianutils"               % "5.0",
     "io.lemonlabs"                 %% "scala-uri"                  % "4.0.3",
     "org.apache.tika"               % "tika-core"                  % "2.9.1",
@@ -53,7 +53,7 @@ libraryDependencies ++=
     "com.typesafe.play"            %% "play-slick"                 % "5.2.0",
     "com.github.tototoshi"         %% "slick-joda-mapper"          % "2.8.0",
     "com.github.tminglei"          %% "slick-pg"                   % "0.21.1",
-    "com.lightbend.akka"           %% "akka-stream-alpakka-slick"  % "7.0.1",
+    "com.lightbend.akka"           %% "akka-stream-alpakka-slick"  % "6.0.2",
     "com.ibm.icu"                   % "icu4j"                      % "74.2",
     "com.typesafe.play"            %% "play-json"                  % "2.10.4",
     "com.typesafe.play"            %% "play-json-joda"             % "2.10.4",
