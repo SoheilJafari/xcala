@@ -233,8 +233,8 @@ trait WithFileUploader extends WithExecutionContext {
     }
       .flatMap { case (finalForm, uploadedFileIds) =>
         val formWithErrorCleaner: Form[A] => Form[A] = { form =>
-          form.bind(
-            form.data.filter { case (_, value) =>
+          form.copy(
+            data = form.data.filter { case (_, value) =>
               !uploadedFileIds.contains(value)
             }
           )
