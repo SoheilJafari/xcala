@@ -1,42 +1,43 @@
-package xcala.play.controllers
+package xcala.play.postgres.controllers
 
-import xcala.play.cross.controllers._
-import xcala.play.models.FileInfo
+import xcala.play.cross.controllers.CrossWithFileUploader
+import xcala.play.cross.services.CrossFileInfoService
 import xcala.play.models.PreResizedImageHolder
-import xcala.play.services.FileInfoService
+import xcala.play.postgres.models.FileInfo
 
 import play.api.libs.Files.TemporaryFile
 import play.api.mvc._
 
 import java.nio.file.Files.readAllBytes
+import java.util.UUID
 import scala.concurrent.Future
 
 import org.apache.commons.io.FilenameUtils
 import org.joda.time.DateTime
-import reactivemongo.api.bson.BSONObjectID
 
 object WithFileUploader {
   val AutoUploadSuffix: String = "_autoupload"
 }
 
-trait WithFileUploader extends CrossWithFileUploader[BSONObjectID] {
+trait WithFileUploader extends CrossWithFileUploader[UUID] {
 
-  protected val fileInfoService: FileInfoService
+  protected val fileInfoService: CrossFileInfoService[UUID, FileInfo]
 
   protected def handleObsoleteUploadedFiles(
       filesIds: Seq[String]
   ): Future[Seq[Either[String, Int]]] =
-    Future.traverse(filesIds.flatMap(BSONObjectID.parse(_).toOption))(fileInfoService.removeFile)
+    Future.traverse(filesIds.map(UUID.fromString))(fileInfoService.removeFile)
 
   protected def saveFile[A](
       filePart        : MultipartFormData.FilePart[TemporaryFile],
       maybeOldModel   : Option[A],
       handlePreResizes: Boolean
-  ): Future[Option[BSONObjectID]] = {
+  ): Future[Option[UUID]] = {
     val fileExtension = FilenameUtils.getExtension(filePart.filename)
 
     val fileInfo = FileInfo(
       name        = filePart.filename,
+      fileName    = java.util.UUID.randomUUID().toString() + fileExtension,
       extension   = fileExtension,
       contentType = filePart.contentType.getOrElse("unknown"),
       length      = filePart.ref.path.toFile.length,

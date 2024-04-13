@@ -6,6 +6,7 @@ import xcala.play.services.s3.FileStorageService
 
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
+import java.util.UUID
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 import scala.util.Failure
@@ -46,8 +47,8 @@ object ImagePreResizingUtils {
 
   }
 
-  def uploadPreResizesRaw(
-      imageFileId       : BSONObjectID,
+  def uploadPreResizesRaw[Id](
+      imageFileId       : Id,
       fileContent       : InputStream,
       fileOriginalName  : String
   )(
@@ -62,7 +63,12 @@ object ImagePreResizingUtils {
           .fromStream(fileContent)
 
         Future.traverse(ImageRenders.ImageResizedRenderType.all) { allowedResize =>
-          val resizedFileName: String = allowedResize.resizedObjectName(imageFileId.stringify)
+          val resizedFileName: String = allowedResize.resizedObjectName(
+            imageFileId match {
+              case x: BSONObjectID => x.stringify
+              case x => x.toString()
+            }
+          )
 
           val bos = new ByteArrayOutputStream()
 

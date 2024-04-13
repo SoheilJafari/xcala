@@ -3,6 +3,7 @@ package xcala.play.services
 import FileInfoService.FileObject
 import s3.FileStorageService
 import s3.FileStorageService.FileS3Object
+import xcala.play.cross.services.CrossFileInfoService
 import xcala.play.extensions.BSONHandlers._
 import xcala.play.models.FileInfo
 import xcala.play.services.DataRemoveServiceImpl
@@ -42,7 +43,8 @@ class FileInfoService @Inject() (
     implicit val ec       : ExecutionContext
 ) extends DataReadSimpleServiceImpl[FileInfo]
     with DataRemoveServiceImpl[FileInfo]
-    with DataSaveServiceImpl[FileInfo] {
+    with DataSaveServiceImpl[FileInfo]
+    with CrossFileInfoService[BSONObjectID, FileInfo] {
 
   val collectionName : String                        = "files"
   val documentHandler: BSONDocumentHandler[FileInfo] = Macros.handler[FileInfo]
@@ -72,9 +74,9 @@ class FileInfoService @Inject() (
       .map(Some(_))
   }
 
-  def removeFile(id: BSONObjectID): Future[Either[String, WriteResult]] = {
+  def removeFile(id: BSONObjectID): Future[Either[String, Int]] = {
     fileStorageService.deleteByObjectName(id.stringify).flatMap {
-      case true => remove(id).map(Right(_))
+      case true => remove(id).map(x => Right(x.n))
       case _    => Future.successful(Left("Storage problem"))
     }
   }
