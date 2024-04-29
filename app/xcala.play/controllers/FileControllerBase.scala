@@ -356,9 +356,9 @@ private[controllers] trait FileControllerBase
         val outImage = (width, height) match {
           case (Some(width), Some(height)) =>
             if ((width.toDouble / height) > widthToHeightRatio) {
-              image.scaleToHeight(height, ScaleMethod.Lanczos3)
+              image.scaleToHeight(height, ScaleMethod.Progressive)
             } else if ((width.toDouble / height) < widthToHeightRatio) {
-              image.scaleToWidth(width, ScaleMethod.Lanczos3)
+              image.scaleToWidth(width, ScaleMethod.Progressive)
             } else {
               image.cover(width, height)
             }

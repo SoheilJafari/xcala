@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
+import scala.concurrent.blocking
 import scala.util.Failure
 import scala.util.Success
 import scala.util.Using
@@ -71,28 +72,33 @@ object ImagePreResizingUtils {
 
           val bos = new ByteArrayOutputStream()
 
-          val resizedImage =
-            originalImage
-              .scaleToWidth(
-                allowedResize.overriddenWidth.toInt,
-                ScaleMethod.Lanczos3
-              )
-          WebpWriter.MAX_LOSSLESS_COMPRESSION.write(
-            resizedImage,
-            ImageMetadata.fromImage(resizedImage),
-            bos
-          )
+          val byteArrayFuture: Future[Array[Byte]] =
+            Future {
+              blocking {
+                val resizedImage: ImmutableImage = originalImage
+                  .scaleToWidth(
+                    allowedResize.overriddenWidth.toInt,
+                    ScaleMethod.Progressive
+                  )
+                WebpWriter.MAX_LOSSLESS_COMPRESSION.write(
+                  resizedImage,
+                  ImageMetadata.fromImage(resizedImage),
+                  bos
+                )
+                bos.close()
 
-          bos.close()
-
-          val byteArray = bos.toByteArray
-
-          fileStorageService.upload(
-            objectName   = resizedFileName,
-            content      = byteArray,
-            contentType  = "image/webp",
-            originalName = fileOriginalName
-          )
+                bos.toByteArray
+              }
+            }
+          for {
+            byteArray <- byteArrayFuture
+            result    <- fileStorageService.upload(
+              objectName   = resizedFileName,
+              content      = byteArray,
+              contentType  = "image/webp",
+              originalName = fileOriginalName
+            )
+          } yield result
 
         }
       }
