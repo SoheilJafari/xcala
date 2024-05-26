@@ -1,7 +1,7 @@
 package xcala.play.utils
 
+import xcala.play.cross.models._
 import xcala.play.models.ImageRenders
-import xcala.play.models.PreResizedImageHolder
 import xcala.play.services.s3.FileStorageService
 
 import java.io.ByteArrayOutputStream
@@ -22,8 +22,8 @@ import reactivemongo.api.bson.BSONObjectID
 
 object ImagePreResizingUtils {
 
-  def removePreResizes(
-      preResizedImageHolder: PreResizedImageHolder
+  def removePreResizes[Id](
+      preResizedImageHolder: CrossPreResizedImageHolder[Id]
   )(
       implicit
       fileStorageService   : FileStorageService,
@@ -32,7 +32,12 @@ object ImagePreResizingUtils {
     preResizedImageHolder.maybeImageFileId match {
       case Some(imageFileId) =>
         Future.traverse(ImageRenders.ImageResizedRenderType.all) { allowedResize =>
-          val resizedFileName: String = allowedResize.resizedObjectName(imageFileId.stringify)
+          val resizedFileName: String = allowedResize.resizedObjectName(
+            imageFileId match {
+              case x: BSONObjectID => x.stringify
+              case x => x.toString()
+            }
+          )
           fileStorageService.deleteByObjectName(resizedFileName).transformWith {
             case Failure(_) =>
               Future.successful(())
@@ -80,7 +85,7 @@ object ImagePreResizingUtils {
                     allowedResize.overriddenWidth.toInt,
                     ScaleMethod.Progressive
                   )
-                WebpWriter.MAX_LOSSLESS_COMPRESSION.write(
+                WebpWriter.MAX_LOSSLESS_COMPRESSION.withMultiThread.write(
                   resizedImage,
                   ImageMetadata.fromImage(resizedImage),
                   bos
@@ -104,8 +109,8 @@ object ImagePreResizingUtils {
       }
     ).flatten
 
-  def uploadPreResizes(
-      preResizedImageHolder: PreResizedImageHolder
+  def uploadPreResizes[Id](
+      preResizedImageHolder: CrossPreResizedImageHolder[Id]
   )(
       implicit
       fileStorageService   : FileStorageService,
@@ -113,7 +118,12 @@ object ImagePreResizingUtils {
   ): Future[Unit] = {
     preResizedImageHolder.maybeImageFileId match {
       case Some(imageFileId) =>
-        fileStorageService.findByObjectName(imageFileId.stringify).map {
+        fileStorageService.findByObjectName(
+          imageFileId match {
+            case x: BSONObjectID => x.stringify
+            case x => x.toString()
+          }
+        ).map {
           file =>
             uploadPreResizesRaw(
               imageFileId      = imageFileId,

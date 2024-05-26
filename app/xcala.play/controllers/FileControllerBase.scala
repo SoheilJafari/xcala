@@ -385,7 +385,7 @@ private[controllers] trait FileControllerBase
 
   protected def getImageWriter(contentType: String): WebpWriter = contentType match {
     // case "image/gif" => Gif2WebpWriter.DEFAULT
-    case _ => WebpWriter.MAX_LOSSLESS_COMPRESSION
+    case _ => WebpWriter.MAX_LOSSLESS_COMPRESSION.withMultiThread
   }
 
 }

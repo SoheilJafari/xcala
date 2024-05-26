@@ -10,7 +10,7 @@ final class Col[A](
     val headerCssClass       : Option[String],
     val addIdToSort          : Boolean
 ) {
-  lazy val fieldMapper = maybeFieldValueMapper.andThen(_.mkString)
+  lazy val fieldMapper: A => String = maybeFieldValueMapper.andThen(_.mkString)
 }
 
 object Col {
@@ -38,7 +38,7 @@ object Col {
       cssClass      : A => Option[String] = (_: A) => None,
       headerCssClass: Option[String]      = None,
       addIdToSort   : Boolean             = false
-  ) =
+  ): Col[A] =
     new Col[A](
       maybeFieldValueMapper = fieldMapper.andThen(Some(_)),
       name                  = name: String,

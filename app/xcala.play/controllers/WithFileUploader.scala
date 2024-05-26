@@ -1,8 +1,8 @@
 package xcala.play.controllers
 
 import xcala.play.cross.controllers._
+import xcala.play.cross.models._
 import xcala.play.models.FileInfo
-import xcala.play.models.PreResizedImageHolder
 import xcala.play.services.FileInfoService
 
 import play.api.libs.Files.TemporaryFile
@@ -52,7 +52,7 @@ trait WithFileUploader extends CrossWithFileUploader[BSONObjectID] {
           if (handlePreResizes) {
 
             handleNewPreResizes(
-              maybeOldModel  = maybeOldModel.asInstanceOf[Option[PreResizedImageHolder]],
+              maybeOldModel  = maybeOldModel.asInstanceOf[Option[CrossPreResizedImageHolder[BSONObjectID]]],
               newFileId      = fileId,
               newFileContent = fileContentByteArray,
               newFileName    = fileInfo.name

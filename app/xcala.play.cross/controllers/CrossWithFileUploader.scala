@@ -1,8 +1,8 @@
 package xcala.play.cross.controllers
 
 import xcala.play.controllers.WithFileUploader.AutoUploadSuffix
+import xcala.play.cross.models._
 import xcala.play.cross.services._
-import xcala.play.models.PreResizedImageHolder
 import xcala.play.services.s3.FileStorageService
 import xcala.play.utils.ImagePreResizingUtils
 import xcala.play.utils.TikaMimeDetector
@@ -109,7 +109,7 @@ trait CrossWithFileUploader[Id] extends WithExecutionContext {
         case None        => false
         case Some(value) =>
           value match {
-            case _: PreResizedImageHolder =>
+            case _: CrossPreResizedImageHolder[_] =>
               true
             case _ =>
               false
@@ -273,14 +273,14 @@ trait CrossWithFileUploader[Id] extends WithExecutionContext {
       }
   }
 
-  protected def handleNewPreResizes[A <: PreResizedImageHolder](
+  protected def handleNewPreResizes[A <: CrossPreResizedImageHolder[Id]](
       maybeOldModel : Option[A],
       newFileId     : Id,
       newFileContent: Array[Byte],
       newFileName   : String
   ): Future[Unit] = {
     implicit val fileStorageService: FileStorageService = fileInfoService.fileStorageService
-    if (!maybeOldModel.map(_.maybeImageFileId).contains(Some(newFileId))) {
+    if (!maybeOldModel.map(_.maybeImageFileId).contains[Option[Id]](Some(newFileId))) {
       for {
         _ <- maybeOldModel.map { oldModel =>
           // removing old model resize images
@@ -311,7 +311,7 @@ trait CrossWithFileUploader[Id] extends WithExecutionContext {
         Future.successful(())
       case Some(value) =>
         value match {
-          case preResizedImageHolder: PreResizedImageHolder =>
+          case preResizedImageHolder: CrossPreResizedImageHolder[_] =>
             ImagePreResizingUtils.removePreResizes(preResizedImageHolder)(
               fileStorageService = fileInfoService.fileStorageService,
               ec                 = ec
