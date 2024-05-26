@@ -1,8 +1,8 @@
 package xcala.play.postgres.controllers
 
 import xcala.play.cross.controllers.CrossWithFileUploader
+import xcala.play.cross.models._
 import xcala.play.cross.services.CrossFileInfoService
-import xcala.play.models.PreResizedImageHolder
 import xcala.play.postgres.models.FileInfo
 
 import play.api.libs.Files.TemporaryFile
@@ -53,7 +53,7 @@ trait WithFileUploader extends CrossWithFileUploader[UUID] {
           if (handlePreResizes) {
 
             handleNewPreResizes(
-              maybeOldModel  = maybeOldModel.asInstanceOf[Option[PreResizedImageHolder]],
+              maybeOldModel  = maybeOldModel.asInstanceOf[Option[CrossPreResizedImageHolder[UUID]]],
               newFileId      = fileId,
               newFileContent = fileContentByteArray,
               newFileName    = fileInfo.name

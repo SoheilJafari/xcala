@@ -2,11 +2,11 @@ name := """xcala.play"""
 
 organization := "com.xcala"
 
-version := "1.2.3"
+version := "1.3.0"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
-scalaVersion := "2.13.13"
+scalaVersion := "2.13.14"
 
 resolvers ++=
   Seq(
@@ -41,26 +41,26 @@ libraryDependencies ++=
     "com.typesafe.akka"            %% "akka-slf4j"                 % "2.8.5",
     "com.bahmanm"                  %% "persianutils"               % "5.0",
     "io.lemonlabs"                 %% "scala-uri"                  % "4.0.3",
-    "org.apache.tika"               % "tika-core"                  % "2.9.1",
-    "ch.qos.logback"                % "logback-classic"            % "1.5.3",
-    "io.sentry"                     % "sentry-logback"             % "7.6.0",
-    "io.minio"                      % "minio"                      % "8.5.9",
+    "org.apache.tika"               % "tika-core"                  % "2.9.2",
+    "ch.qos.logback"                % "logback-classic"            % "1.5.6",
+    "io.sentry"                     % "sentry-logback"             % "7.9.0",
+    "io.minio"                      % "minio"                      % "8.5.10",
     "commons-io"                    % "commons-io"                 % "2.15.1",
-    "com.sksamuel.scrimage"        %% "scrimage-scala"             % "4.1.1",
-    "com.sksamuel.scrimage"         % "scrimage-webp"              % "4.1.1",
-    "com.fasterxml.jackson.module" %% "jackson-module-scala"       % "2.16.2",
-    "org.postgresql"                % "postgresql"                 % "42.7.2",
+    "com.sksamuel.scrimage"        %% "scrimage-scala"             % "4.1.3",
+    "com.sksamuel.scrimage"         % "scrimage-webp"              % "4.1.3",
+    "com.fasterxml.jackson.module" %% "jackson-module-scala"       % "2.17.1",
+    "org.postgresql"                % "postgresql"                 % "42.7.3",
     "com.typesafe.play"            %% "play-slick"                 % "5.2.0",
-    "com.github.tototoshi"         %% "slick-joda-mapper"          % "2.8.0",
+    "com.github.tototoshi"         %% "slick-joda-mapper"          % "2.9.1",
     "com.github.tminglei"          %% "slick-pg"                   % "0.21.1",
     "com.lightbend.akka"           %% "akka-stream-alpakka-slick"  % "6.0.2",
-    "com.ibm.icu"                   % "icu4j"                      % "74.2",
+    "com.ibm.icu"                   % "icu4j"                      % "75.1",
     "com.typesafe.play"            %% "play-json"                  % "2.10.4",
     "com.typesafe.play"            %% "play-json-joda"             % "2.10.4",
     specs2                          % Test
   )
 
-ThisBuild / scapegoatVersion := "2.1.5"
+ThisBuild / scapegoatVersion := "2.1.6"
 
 scapegoatIgnoredFiles :=
   Seq(
@@ -124,13 +124,11 @@ publishLocalConfiguration := publishLocalConfiguration.value.withOverwrite(true)
 
 Test / javaOptions ++= Seq("--add-opens=java.base/java.lang=ALL-UNNAMED")
 
-ThisBuild / scalafixScalaBinaryVersion := CrossVersion.binaryScalaVersion(scalaVersion.value)
-
 // Semanticdb is only for better IDE experience. therefore we disable it in non-development environments
 if (sys.props.getOrElse("ci", "") != "true") {
   new Def.SettingList(
     Seq(
-      addCompilerPlugin("org.scalameta" % "semanticdb-scalac" % "4.9.2" cross CrossVersion.full),
+      addCompilerPlugin("org.scalameta" % "semanticdb-scalac" % "4.9.5" cross CrossVersion.full),
       scalacOptions ++=
         List(
           "-Yrangepos",

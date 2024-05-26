@@ -45,7 +45,7 @@ object ImageRenders {
     new QueryStringBindable[ImageRenderType] {
 
       def bind(key: String, params: Map[String, Seq[String]]): Option[Either[String, ImageRenderType]] =
-        params.get(key).getOrElse(Nil).headOption match {
+        params.getOrElse(key, Nil).headOption match {
           case Some(ExtraSmall.suffix) => Some(Right(ExtraSmall))
           case Some(Small.suffix)      => Some(Right(Small))
           case Some(Medium.suffix)     => Some(Right(Medium))
