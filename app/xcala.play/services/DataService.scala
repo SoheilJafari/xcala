@@ -171,7 +171,7 @@ trait DataReadSimpleServiceImpl[Doc <: DocumentWithId]
       case _   => sortInfos
     }
 
-  protected def defaultSort: Seq[SortInfo] = Nil
+  protected def defaultSort: Seq[SortInfo] = Seq(SortInfo("_id", 1))
 
 }
 
