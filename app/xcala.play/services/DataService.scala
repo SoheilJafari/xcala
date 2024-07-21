@@ -225,6 +225,14 @@ trait DataSaveServiceImpl[Doc <: DocumentWithId]
     collectionFuture.flatMap(_.insert.one(setCreateAndUpdateTime(newDoc)).map(_ => objectId))
   }
 
+  def bulkInsert(models: Seq[Doc]): Future[(BSONCollection#MultiBulkWriteResult, Seq[BSONObjectID])] = {
+
+    val (newDocs, newIds) = models.map(getDocWithId).unzip
+
+    collectionFuture.flatMap(_.insert.many(newDocs.map(setCreateAndUpdateTime))).map(_ -> newIds)
+
+  }
+
   def save(model: Doc): Future[BSONObjectID] = {
     val (newDoc, objectId) = getDocWithId(model)
     val updateDoc          = setCreateAndUpdateTime(newDoc)
