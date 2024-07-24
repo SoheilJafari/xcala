@@ -47,8 +47,8 @@ class FileStorageService @Inject() (
 
   import FileStorageService._
 
-  private lazy val baseURL   : String = config.get[String]("fileStorage.s3.baseUrl")
-  private lazy val bucketName: String = config.get[String]("fileStorage.s3.bucketName")
+  private lazy val baseURL: String = config.get[String]("fileStorage.s3.baseUrl")
+  lazy val bucketName     : String = config.get[String]("fileStorage.s3.bucketName")
 
   lazy val fileStorageUrl: String = s"$baseURL/$bucketName"
 

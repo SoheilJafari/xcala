@@ -1,9 +1,10 @@
 package xcala.play.controllers
 
+import xcala.play.cross.services.ImagePreResizingService
+import xcala.play.cross.utils.LazyInjector
 import xcala.play.models._
 import xcala.play.services._
 import xcala.play.utils.BaseStorageUrls
-import xcala.play.utils.ImagePreResizingUtils
 import xcala.play.utils.WithExecutionContext
 
 import akka.actor.ActorSystem
@@ -17,7 +18,8 @@ import akka.util.ByteString
 import play.api.Configuration
 import play.api.cache.AsyncCacheApi
 import play.api.http.HttpEntity
-import play.api.i18n.{I18nSupport, Messages}
+import play.api.i18n.I18nSupport
+import play.api.i18n.Messages
 import play.api.libs.Files
 import play.api.libs.json.Json
 import play.api.libs.json.JsValue
@@ -28,7 +30,6 @@ import play.api.mvc.InjectedController
 import play.api.mvc.MultipartFormData
 import play.api.mvc.Result
 
-import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.net.SocketTimeoutException
@@ -63,6 +64,9 @@ private[controllers] trait FileControllerBase
   val actorSystem              : ActorSystem
   implicit val configuration   : Configuration
   implicit val mat             : Materializer
+
+  lazy val imagePreResizingService: ImagePreResizingService =
+    LazyInjector.injector.instanceOf[ImagePreResizingService]
 
   def defaultInternalServerError(implicit adminRequest: RequestType[_]): Result
 
@@ -135,13 +139,8 @@ private[controllers] trait FileControllerBase
           case Right(fileId) =>
             {
               if (handlePreResizes) {
-                ImagePreResizingUtils.uploadPreResizesRaw(
-                  imageFileId      = fileId,
-                  fileContent      = new ByteArrayInputStream(fileContentBytes),
-                  fileOriginalName = file.filename
-                )(
-                  ec                 = ec,
-                  fileStorageService = fileInfoService.fileStorageService
+                imagePreResizingService.uploadPreResizesByFileObjectName(
+                  fileObjectName = fileId
                 )
               } else {
                 Future.successful(())
