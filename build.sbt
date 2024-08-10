@@ -2,7 +2,7 @@ name := """xcala.play"""
 
 organization := "com.xcala"
 
-version := "1.6.3"
+version := "1.7.1"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
