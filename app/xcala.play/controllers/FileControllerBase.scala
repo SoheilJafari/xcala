@@ -350,38 +350,49 @@ private[controllers] trait FileControllerBase
       height            : Option[Int],
       contentType       : String,
       widthToHeightRatio: Double
-  ): Future[Result] =
-    Future {
-      blocking {
-        val outImage = (width, height) match {
-          case (Some(width), Some(height)) =>
-            if ((width.toDouble / height) > widthToHeightRatio) {
-              image.scaleToHeight(height, ScaleMethod.Progressive)
-            } else if ((width.toDouble / height) < widthToHeightRatio) {
-              image.scaleToWidth(width, ScaleMethod.Progressive)
-            } else {
-              image.cover(width, height)
+  ): Future[Result] = {
+    val stream =
+      Source.futureSource {
+        Future {
+          blocking {
+            val outImage = (width, height) match {
+              case (Some(width), Some(height)) =>
+                if ((width.toDouble / height) > widthToHeightRatio) {
+                  image.scaleToHeight(height, ScaleMethod.Progressive)
+                } else if ((width.toDouble / height) < widthToHeightRatio) {
+                  image.scaleToWidth(width, ScaleMethod.Progressive)
+                } else {
+                  image.cover(width, height)
+                }
+              case (Some(width), None)         =>
+                image.scaleToWidth(width)
+              case (None, Some(height))        =>
+                image.scaleToHeight(height)
+              case _                           =>
+                throw new IllegalArgumentException()
             }
-          case (Some(width), None)         =>
-            image.scaleToWidth(width)
-          case (None, Some(height))        =>
-            image.scaleToHeight(height)
-          case _                           =>
-            throw new IllegalArgumentException()
+
+            val bos = new ByteArrayOutputStream()
+            getImageWriter(contentType).write(outImage, ImageMetadata.fromImage(outImage), bos)
+            Source.single(ByteString(bos.toByteArray()))
+          }
         }
-
-        val bos = new ByteArrayOutputStream()
-        getImageWriter(contentType).write(outImage, ImageMetadata.fromImage(outImage), bos)
-
-        bos.close()
-
-        val body = HttpEntity.Strict(
-          ByteString(bos.toByteArray),
-          Some(MediaTypes.`image/webp`.value)
-        )
-        Result(header = ResponseHeader(status = 200), body = body)
       }
-    }
+
+    val body = HttpEntity.Streamed(
+      stream,
+      None,
+      Some(MediaTypes.`image/webp`.value)
+    )
+
+    Future.successful(
+      Result(
+        header = ResponseHeader(status = 200),
+        body   = body
+      )
+    )
+
+  }
 
   protected def getImageWriter(contentType: String): WebpWriter = contentType match {
     // case "image/gif" => Gif2WebpWriter.DEFAULT
