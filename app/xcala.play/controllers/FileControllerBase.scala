@@ -1,13 +1,12 @@
 package xcala.play.controllers
 
+import xcala.play.cross
 import xcala.play.models._
 import xcala.play.services._
 import xcala.play.utils.BaseStorageUrls
 import xcala.play.utils.ImagePreResizingUtils
-import xcala.play.utils.WithExecutionContext
 
 import akka.actor.ActorSystem
-import akka.http.scaladsl.model.MediaTypes
 import akka.stream.IOResult
 import akka.stream.Materializer
 import akka.stream.scaladsl.Flow
@@ -17,7 +16,8 @@ import akka.util.ByteString
 import play.api.Configuration
 import play.api.cache.AsyncCacheApi
 import play.api.http.HttpEntity
-import play.api.i18n.{I18nSupport, Messages}
+import play.api.i18n.I18nSupport
+import play.api.i18n.Messages
 import play.api.libs.Files
 import play.api.libs.json.Json
 import play.api.libs.json.JsValue
@@ -29,20 +29,14 @@ import play.api.mvc.MultipartFormData
 import play.api.mvc.Result
 
 import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.net.SocketTimeoutException
 import java.nio.file.Files.readAllBytes
-import scala.concurrent._
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.util.Failure
 import scala.util.Success
 
-import com.sksamuel.scrimage.ImmutableImage
-import com.sksamuel.scrimage.ScaleMethod
-import com.sksamuel.scrimage.metadata.ImageMetadata
-import com.sksamuel.scrimage.webp.WebpWriter
 import io.sentry.Hint
 import io.sentry.Sentry
 import org.apache.commons.io.FilenameUtils
@@ -52,8 +46,8 @@ import reactivemongo.api.bson._
 private[controllers] trait FileControllerBase
     extends InjectedController
     with WithComposableActions
-    with WithExecutionContext
-    with I18nSupport {
+    with I18nSupport
+    with cross.controllers.ImageRendererController {
 
   implicit val messagesProvider: Messages
   val fileInfoService          : FileInfoService
@@ -342,61 +336,6 @@ private[controllers] trait FileControllerBase
             Success(InternalServerError)
         }
     }
-  }
-
-  protected def renderImage(
-      image             : ImmutableImage,
-      width             : Option[Int],
-      height            : Option[Int],
-      contentType       : String,
-      widthToHeightRatio: Double
-  ): Future[Result] = {
-    val stream =
-      Source.futureSource {
-        Future {
-          blocking {
-            val outImage = (width, height) match {
-              case (Some(width), Some(height)) =>
-                if ((width.toDouble / height) > widthToHeightRatio) {
-                  image.scaleToHeight(height, ScaleMethod.Progressive)
-                } else if ((width.toDouble / height) < widthToHeightRatio) {
-                  image.scaleToWidth(width, ScaleMethod.Progressive)
-                } else {
-                  image.cover(width, height)
-                }
-              case (Some(width), None)         =>
-                image.scaleToWidth(width)
-              case (None, Some(height))        =>
-                image.scaleToHeight(height)
-              case _                           =>
-                throw new IllegalArgumentException()
-            }
-
-            val bos = new ByteArrayOutputStream()
-            getImageWriter(contentType).write(outImage, ImageMetadata.fromImage(outImage), bos)
-            Source.single(ByteString(bos.toByteArray()))
-          }
-        }
-      }
-
-    val body = HttpEntity.Streamed(
-      stream,
-      None,
-      Some(MediaTypes.`image/webp`.value)
-    )
-
-    Future.successful(
-      Result(
-        header = ResponseHeader(status = 200),
-        body   = body
-      )
-    )
-
-  }
-
-  protected def getImageWriter(contentType: String): WebpWriter = contentType match {
-    // case "image/gif" => Gif2WebpWriter.DEFAULT
-    case _ => WebpWriter.MAX_LOSSLESS_COMPRESSION.withMultiThread
   }
 
 }
