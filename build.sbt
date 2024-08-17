@@ -2,7 +2,7 @@ name := """xcala.play"""
 
 organization := "com.xcala"
 
-version := "1.7.4"
+version := "1.7.5"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
@@ -86,8 +86,6 @@ scapegoatDisabledInspections :=
     "AsInstanceOf",
     "ClassNames"
   )
-
-pipelineStages := Seq(gzip)
 
 routesImport ++=
   Seq(
