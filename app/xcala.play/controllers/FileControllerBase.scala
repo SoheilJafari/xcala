@@ -128,7 +128,7 @@ private[controllers] trait FileControllerBase
         fileInfoService.upload(fileInfo, fileContentBytes).flatMap {
           case Right(fileId) =>
             {
-              if (handlePreResizes) {
+              if (handlePreResizes && fileInfo.isImage) {
                 ImagePreResizingUtils.uploadPreResizesRaw(
                   imageFileId      = fileId,
                   fileContent      = new ByteArrayInputStream(fileContentBytes),
