@@ -2,7 +2,7 @@ name := """xcala.play"""
 
 organization := "com.xcala"
 
-version := "1.8.0"
+version := "1.8.1"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
@@ -10,6 +10,7 @@ scalaVersion := "2.13.14"
 
 resolvers ++=
   Seq(
+    "Sonatype Nexus Repository Manager".at("https://nexus.darkube.app/repository/ajor-maven/")
   )
 
 publishTo :=
@@ -86,11 +87,6 @@ scapegoatDisabledInspections :=
     "AsInstanceOf",
     "ClassNames"
   )
-
-Assets / LessKeys.less / includeFilter := "*.less"
-Assets / LessKeys.less / excludeFilter := "_*.less"
-
-pipelineStages := Seq(gzip)
 
 routesImport ++=
   Seq(
