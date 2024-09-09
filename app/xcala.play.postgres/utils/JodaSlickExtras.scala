@@ -32,7 +32,7 @@ object PostgresJodaSlickExtras extends JodaSlickExtras {
       node2       : Node,
       queryBuilder: JdbcStatementBuilderComponent#QueryBuilder
   ): SQLBuilder = {
-    queryBuilder.sqlBuilder += s"DATE_PART('${unit}', "
+    queryBuilder.sqlBuilder += s"DATE_PART('$unit', "
     queryBuilder.expr(node2)
     queryBuilder.sqlBuilder += " - "
     queryBuilder.expr(node1)
@@ -72,7 +72,7 @@ object H2JodaSlickExtras extends JodaSlickExtras {
       node2       : Node,
       queryBuilder: JdbcStatementBuilderComponent#QueryBuilder
   ): SQLBuilder = {
-    queryBuilder.sqlBuilder += s"DATEDIFF('${unit}', "
+    queryBuilder.sqlBuilder += s"DATEDIFF('$unit', "
     queryBuilder.expr(node1)
     queryBuilder.sqlBuilder += ", "
     queryBuilder.expr(node2)

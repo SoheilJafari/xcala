@@ -47,7 +47,7 @@ trait IndexableService[Doc <: DocumentWithId with Indexable]
       case Success(_) =>
         val result = super.save(model)
 
-        result.flatMap { case objectId =>
+        result.flatMap { objectId =>
           saveItem(objectId, model).map { _ =>
             objectId
           }
@@ -71,7 +71,7 @@ trait IndexableService[Doc <: DocumentWithId with Indexable]
         )
 
     existingItem
-      .map { case existingItem: Option[IndexedItem] =>
+      .map{ existingItem: Option[IndexedItem] =>
         updateOrNewIndexedItem(indexedItem = existingItem, id = id, model = model)
       }
       .flatMap { indexedItem: IndexedItem =>

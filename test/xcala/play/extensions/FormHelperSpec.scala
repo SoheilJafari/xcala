@@ -18,7 +18,7 @@ import org.specs2.mutable._
 
 class FormHelperSpec(cmd: CommandLine) extends Specification {
 
-  val configFilePath =
+  val configFilePath: String =
     cmd.arguments.find(_.startsWith("-Dtest.config")).map(_.split("=")(1)).getOrElse("./conf/local-test.conf")
 
   val configuration: Configuration =
@@ -35,7 +35,7 @@ class FormHelperSpec(cmd: CommandLine) extends Specification {
 
     }
 
-  val hostName = configuration.get[String]("mongodbHost")
+  val hostName: String = configuration.get[String]("mongodbHost")
 
   val form: Form[(String, String)] = Form(
     tuple(

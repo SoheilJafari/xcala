@@ -13,7 +13,7 @@ object QueryHelpers {
       block(query).getOrElse(query)
     }
 
-    def multiSort[V <: Enumeration, A <: SortOptionsBase[A]](
+    private def multiSort[V <: Enumeration, A <: SortOptionsBase[A]](
         sortOptions    : SortOptionsBase[A],
         sortEnumeration: V
     )(

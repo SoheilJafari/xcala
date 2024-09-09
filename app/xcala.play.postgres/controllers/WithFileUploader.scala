@@ -37,7 +37,7 @@ trait WithFileUploader extends CrossWithFileUploader[UUID] {
 
     val fileInfo = FileInfo(
       name        = filePart.filename,
-      fileName    = java.util.UUID.randomUUID().toString() + fileExtension,
+      fileName    = java.util.UUID.randomUUID().toString + fileExtension,
       extension   = fileExtension,
       contentType = filePart.contentType.getOrElse("unknown"),
       length      = filePart.ref.path.toFile.length,

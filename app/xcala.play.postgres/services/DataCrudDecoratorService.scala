@@ -8,7 +8,7 @@ import scala.language.reflectiveCalls
 
 /** Decorator service.
   */
-trait DataCrudServiceDecorator[Id, Entity <: EntityWithId[Id], Model <: { val id: Option[Id] }]
+trait DataCrudDecoratorService[Id, Entity <: EntityWithId[Id], Model <: { val id: Option[Id] }]
     extends DataReadSimpleService[Id, Entity, Model]
     with DataSaveService[Id, Entity, Model]
     with DataRemoveService[Id, Entity]

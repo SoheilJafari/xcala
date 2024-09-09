@@ -90,8 +90,8 @@ object DataReadServiceDecorator {
       }
 
   final case class RelationMapper[Doc, InnerModel, +K[_] <: IterableOnce[_]](
-      val docToKeySet                 : Doc => Set[BSONObjectID],
-      val allKeysToKeySetToInnerModels: Set[BSONObjectID] => Future[Map[Set[BSONObjectID], Seq[InnerModel]]]
+      docToKeySet                 : Doc => Set[BSONObjectID],
+      allKeysToKeySetToInnerModels: Set[BSONObjectID] => Future[Map[Set[BSONObjectID], Seq[InnerModel]]]
   )(
       val innerModelIterableMapper    : Option[_] => IterableOnce[_]
   ) {

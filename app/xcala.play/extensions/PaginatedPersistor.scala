@@ -32,14 +32,14 @@ object PaginatedPersistor {
 
       val url = keys.foldLeft[String](call.toString) { case (prevUrl, nextKey) =>
         request.queryString.get(nextKey) match {
-          case Some(values) if values.exists(_.size > 0) =>
+          case Some(values) if values.exists(_.nonEmpty) =>
             nextKey match {
               case "paginatedParams" =>
                 attachQueryString(prevUrl, values.mkString)
 
               case _: String =>
                 val stringValue = values.head
-                attachQueryString(prevUrl, s"$nextKey=${stringValue}")
+                attachQueryString(prevUrl, s"$nextKey=$stringValue")
 
             }
           case _                                         => prevUrl

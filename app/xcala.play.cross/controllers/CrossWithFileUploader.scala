@@ -211,7 +211,7 @@ trait CrossWithFileUploader[Id] extends WithExecutionContext {
                     Seq(
                       fileId match {
                         case x: BSONObjectID => x.stringify
-                        case x => x.toString()
+                        case x => x.toString
                       }
                     )
                 case None         =>

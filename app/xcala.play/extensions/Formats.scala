@@ -29,7 +29,7 @@ object Formats {
   implicit val bsonObjectIDFormatter: Formatter[BSONObjectID] = new Formatter[BSONObjectID] {
 
     def bind(key: String, data: Map[String, String]): Either[Seq[FormError], BSONObjectID] = {
-      parsing(parse = BSONObjectID.parse(_), errMsg = "error.objectId", errArgs = Nil)(key, data)
+      parsing(parse = BSONObjectID.parse, errMsg = "error.objectId", errArgs = Nil)(key, data)
     }
 
     def unbind(key: String, value: BSONObjectID): Map[String, String] = Map(key -> value.stringify)

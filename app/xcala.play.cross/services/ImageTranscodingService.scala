@@ -89,7 +89,7 @@ class ImageTranscodingService(
       .withGroupId(groupId)
       .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
 
-  private val clientResultTopic: String = UUID.randomUUID().toString()
+  private val clientResultTopic: String = UUID.randomUUID().toString
 
   private val resizeResultListenerActor: ActorRef =
     ResizeResultListenerActor.create(
@@ -190,7 +190,7 @@ class ImageTranscodingService(
     val fileObjectNameString: String =
       fileObjectName match {
         case x: BSONObjectID => x.stringify
-        case x => x.toString()
+        case x => x.toString
       }
     fileStorageService.findByObjectName(
       fileObjectNameString
@@ -209,7 +209,7 @@ class ImageTranscodingService(
         .unzip
 
       val askingForAnswer = Future.traverse(ids) { id =>
-        (resizeResultListenerActor ? (ResizeResultListenerActor.GetResult(id)))
+        (resizeResultListenerActor ? ResizeResultListenerActor.GetResult(id))
           .mapTo[ImageTranscodingResponse]
       }.map {
         _.foldLeft(Set.empty[String]) {
@@ -283,7 +283,7 @@ class ImageTranscodingService(
           val resizedFileName: String = allowedResize.resizedObjectName(
             imageFileId match {
               case x: BSONObjectID => x.stringify
-              case x => x.toString()
+              case x => x.toString
             }
           )
           fileStorageService.deleteByObjectName(resizedFileName).transformWith {

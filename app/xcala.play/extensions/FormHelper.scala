@@ -54,7 +54,7 @@ object FormHelper {
         play.api.data.format.JodaFormats.jodaLocalDateFormat(pattern).bind(key, data) match {
           case Left(formErrors) => Left(formErrors)
           case Right(value)     =>
-            val year = value.getYear()
+            val year = value.getYear
             if (year < minYear || year > maxYear) {
               Left(Seq(FormError(key, "error.invalidFormat")))
             } else {
@@ -63,7 +63,7 @@ object FormHelper {
         }
 
       override def unbind(key: String, value: LocalDate): Map[String, String] = {
-        val year = value.getYear()
+        val year = value.getYear
         if (year < minYear || year > maxYear) {
           Map.empty[String, String]
         } else {
@@ -85,7 +85,7 @@ object FormHelper {
           case Left(formErrors) =>
             Left(formErrors)
           case Right(value)     =>
-            val year = value.getYear()
+            val year = value.getYear
             if (year < minYear || year > maxYear) {
               Left(Seq(FormError(key, "error.invalidFormat")))
             } else {
@@ -94,7 +94,7 @@ object FormHelper {
         }
 
       override def unbind(key: String, value: DateTime): Map[String, String] = {
-        val year = value.getYear()
+        val year = value.getYear
         if (year < minYear || year > maxYear) {
           Map.empty[String, String]
         } else {
@@ -178,13 +178,13 @@ object FormHelper {
   }
 
   lazy val dateRangeMapping: Mapping[Range[Option[LocalDate]]] = mapping(
-    "from" -> optional(jodaLocalDateMappingWithYearRestriction(pattern = "yyyy-MM-dd")),
-    "to"   -> optional(jodaLocalDateMappingWithYearRestriction(pattern = "yyyy-MM-dd"))
+    "from" -> optional(jodaLocalDateMappingWithYearRestriction()),
+    "to"   -> optional(jodaLocalDateMappingWithYearRestriction())
   )(Range.apply[Option[LocalDate]])(Range.unapply[Option[LocalDate]])
 
   lazy val dateRangeMappingNonOptional: Mapping[Range[LocalDate]] = mapping(
-    "from" -> jodaLocalDateMappingWithYearRestriction(pattern = "yyyy-MM-dd"),
-    "to"   -> jodaLocalDateMappingWithYearRestriction(pattern = "yyyy-MM-dd")
+    "from" -> jodaLocalDateMappingWithYearRestriction(),
+    "to"   -> jodaLocalDateMappingWithYearRestriction()
   )(Range.apply[LocalDate])(Range.unapply[LocalDate])
 
   lazy val dateTimeRangeMapping: Mapping[Range[Option[DateTime]]] = mapping(

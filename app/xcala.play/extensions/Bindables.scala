@@ -14,7 +14,7 @@ object Bindables {
 
     def bind(key: String, params: Map[String, Seq[String]]): Option[Either[String, DateTime]] = {
       try {
-        Some(Right(new DateTime(params.get(key).get.head.toLong)))
+        Some(Right(new DateTime(params(key).head.toLong)))
       } catch {
         case _: IllegalArgumentException | _: NumberFormatException =>
           Some(Left("Invalid date time format. Use a long number as milliseconds since midnight Jan 1, 1970"))
@@ -28,7 +28,7 @@ object Bindables {
 
     def bind(key: String, params: Map[String, Seq[String]]): Option[Either[String, LocalDate]] = {
       try {
-        Some(Right(new LocalDate(params.get(key).get.head)))
+        Some(Right(new LocalDate(params(key).head)))
       } catch {
         case _: IllegalArgumentException | _: NumberFormatException => Some(Left("Invalid local date format"))
       }
