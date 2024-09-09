@@ -5,7 +5,7 @@ import play.api.libs.json.OFormat
 
 import java.util.UUID
 
-final case class ImageResizingRequest(
+final case class ImageTranscodingRequest(
     id              : UUID,
     objectName      : String,
     bucketName      : String,
@@ -13,23 +13,23 @@ final case class ImageResizingRequest(
     fileOriginalName: String,
     resizedImageName: String,
     resultTopic     : String
-) extends ImageResizingMessage {
+) extends ImageTranscodingMessage {
 
-  def makeSuccessfulResponse(): ImageResizingResponse =
-    ImageResizingResponse(
+  def makeSuccessfulResponse(): ImageTranscodingResponse =
+    ImageTranscodingResponse(
       id    = id,
       error = None
     )
 
-  def makeFailedResponse(errorMessage: String): ImageResizingResponse =
-    ImageResizingResponse(
+  def makeFailedResponse(errorMessage: String): ImageTranscodingResponse =
+    ImageTranscodingResponse(
       id    = id,
       error = Some(errorMessage)
     )
 
 }
 
-object ImageResizingRequest {
+object ImageTranscodingRequest {
 
   def create(
       objectName      : String,
@@ -38,8 +38,8 @@ object ImageResizingRequest {
       fileOriginalName: String,
       resizedImageName: String,
       resultTopic     : String
-  ): ImageResizingRequest =
-    ImageResizingRequest(
+  ): ImageTranscodingRequest =
+    ImageTranscodingRequest(
       id               = UUID.randomUUID(),
       objectName       = objectName,
       bucketName       = bucketName,
@@ -49,7 +49,7 @@ object ImageResizingRequest {
       resultTopic      = resultTopic
     )
 
-  implicit val formatter: OFormat[ImageResizingRequest] =
-    Json.format[ImageResizingRequest]
+  implicit val formatter: OFormat[ImageTranscodingRequest] =
+    Json.format[ImageTranscodingRequest]
 
 }

@@ -10,14 +10,14 @@ import javax.inject._
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class ImagePreResizingProviderService @Inject() (
+class ImageTranscodingProviderService @Inject() (
     actorSystem       : ActorSystem,
     configuration     : Configuration,
     fileStorageService: FileStorageService
 )(implicit val ec: ExecutionContext, val mat: Materializer) {
 
-  lazy val preResizingService: ImagePreResizingService = {
-    new ImagePreResizingService(actorSystem, configuration, fileStorageService)
+  lazy val transcodingService: ImageTranscodingService = {
+    new ImageTranscodingService(actorSystem, configuration, fileStorageService)
   }
 
 }

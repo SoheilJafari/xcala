@@ -1,7 +1,7 @@
 package xcala.play.cross.services
 
 import xcala.play.cross.models._
-import xcala.play.cross.services.ImagePreResizingService.ResizeResultListenerActor.HandleIncomingResult
+import xcala.play.cross.services.ImageTranscodingService.ResizeResultListenerActor.HandleIncomingResult
 import xcala.play.models.ImageRenders
 import xcala.play.services.s3.FileStorageService
 
@@ -52,7 +52,7 @@ import reactivemongo.api.bson.BSONObjectID
   This class needs to be manually instantiated using its provider because not all Xcala based projects need it.
   DO NOT ADD SINGLETON
  */
-class ImagePreResizingService(
+class ImageTranscodingService(
     actorSystem       : ActorSystem,
     configuration     : Configuration,
     fileStorageService: FileStorageService
@@ -61,7 +61,7 @@ class ImagePreResizingService(
     val ec            : ExecutionContext,
     val mat           : Materializer
 ) {
-  import ImagePreResizingService._
+  import ImageTranscodingService._
 
   private val bootstrapServer: String = configuration.get[String]("kafka.bootstrapServer")
   private val requestTopic   : String = configuration.get[String]("kafka.resizingRequestTopic")
@@ -130,7 +130,7 @@ class ImagePreResizingService(
           .map { message =>
             {
               Try(
-                Json.fromJson[ImageResizingResponse](
+                Json.fromJson[ImageTranscodingResponse](
                   Json.parse(message.record.value())
                 ).asOpt
               )
@@ -196,7 +196,7 @@ class ImagePreResizingService(
       fileObjectNameString
     ).flatMap { file =>
       val (ids, jsons) = ImageRenders.ImageResizedRenderType.all.map { resizeType =>
-        ImageResizingRequest.create(
+        ImageTranscodingRequest.create(
           objectName       = fileObjectNameString,
           bucketName       = fileStorageService.bucketName,
           targetWidth      = resizeType.overriddenWidth,
@@ -210,7 +210,7 @@ class ImagePreResizingService(
 
       val askingForAnswer = Future.traverse(ids) { id =>
         (resizeResultListenerActor ? (ResizeResultListenerActor.GetResult(id)))
-          .mapTo[ImageResizingResponse]
+          .mapTo[ImageTranscodingResponse]
       }.map {
         _.foldLeft(Set.empty[String]) {
           case (previousErrors, currentResponse) =>
@@ -302,7 +302,7 @@ class ImagePreResizingService(
 
 }
 
-object ImagePreResizingService {
+object ImageTranscodingService {
 
   final class ResizeResultListenerActor extends Actor {
 
@@ -311,22 +311,22 @@ object ImagePreResizingService {
 
     override def receive: Receive = receive(Map.empty)
 
-    def receive(trackingIds: Map[UUID, Promise[ImageResizingResponse]]): Receive = {
+    def receive(trackingIds: Map[UUID, Promise[ImageTranscodingResponse]]): Receive = {
       case GetResult(uuid) =>
-        val promise     = Promise[ImageResizingResponse]()
+        val promise     = Promise[ImageTranscodingResponse]()
         val senderActor = sender()
         promise.future.pipeTo(senderActor)
         context.become(receive(trackingIds + (uuid -> promise)))
 
-      case HandleIncomingResult(imageResizingResponse) =>
-        trackingIds.get(imageResizingResponse.id) match {
+      case HandleIncomingResult(imageTranscodingResponse) =>
+        trackingIds.get(imageTranscodingResponse.id) match {
           case None          =>
             Sentry.captureMessage(
               "trackingId does not exists!"
             )
           case Some(promise) =>
-            promise.success(imageResizingResponse)
-            context.become(receive(trackingIds.removed(imageResizingResponse.id)))
+            promise.success(imageTranscodingResponse)
+            context.become(receive(trackingIds.removed(imageTranscodingResponse.id)))
         }
     }
 
@@ -335,7 +335,7 @@ object ImagePreResizingService {
   object ResizeResultListenerActor {
 
     final case class GetResult(id: UUID)
-    final case class HandleIncomingResult(imageResizingResponse: ImageResizingResponse)
+    final case class HandleIncomingResult(ImageTranscodingResponse: ImageTranscodingResponse)
 
     def create(actorSystem: ActorSystem): ActorRef =
       actorSystem.actorOf(

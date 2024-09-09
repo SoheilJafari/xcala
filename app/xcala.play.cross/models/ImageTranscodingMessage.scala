@@ -2,7 +2,7 @@ package xcala.play.cross.models
 
 import java.util.UUID
 
-trait ImageResizingMessage {
+trait ImageTranscodingMessage {
   def id: UUID
 
 }

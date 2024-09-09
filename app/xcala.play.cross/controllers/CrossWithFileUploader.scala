@@ -3,7 +3,7 @@ package xcala.play.cross.controllers
 import xcala.play.controllers.WithFileUploader.AutoUploadSuffix
 import xcala.play.cross.models._
 import xcala.play.cross.services._
-import xcala.play.cross.services.ImagePreResizingService
+import xcala.play.cross.services.ImageTranscodingService
 import xcala.play.cross.utils.LazyInjector
 import xcala.play.services.s3.FileStorageService
 import xcala.play.utils.TikaMimeDetector
@@ -28,8 +28,8 @@ trait CrossWithFileUploader[Id] extends WithExecutionContext {
 
   protected type KeyValuesPair = (String, Seq[String])
 
-  lazy val imagePreResizingService: ImagePreResizingService =
-    LazyInjector.injector.instanceOf[ImagePreResizingProviderService].preResizingService
+  lazy val imageTranscodingService: ImageTranscodingService =
+    LazyInjector.injector.instanceOf[ImageTranscodingProviderService].transcodingService
 
   protected def isAutoUpload(f: MultipartFormData.FilePart[TemporaryFile]): Boolean =
     f.key.endsWith("." + AutoUploadSuffix)
@@ -293,13 +293,13 @@ trait CrossWithFileUploader[Id] extends WithExecutionContext {
       for {
         _ <- maybeOldModel.map { oldModel =>
           // removing old model resize images
-          imagePreResizingService.removePreResizes(oldModel)
+          imageTranscodingService.removePreResizes(oldModel)
 
         }.getOrElse {
           Future.successful(())
         }
 
-        resizingResult <- imagePreResizingService.uploadPreResizesByFileObjectName(
+        resizingResult <- imageTranscodingService.uploadPreResizesByFileObjectName(
           fileObjectName = newFileId
         )
 
@@ -319,7 +319,7 @@ trait CrossWithFileUploader[Id] extends WithExecutionContext {
       case Some(value) =>
         value match {
           case preResizedImageHolder: CrossPreResizedImageHolder[_] =>
-            imagePreResizingService.removePreResizes(preResizedImageHolder)(
+            imageTranscodingService.removePreResizes(preResizedImageHolder)(
               fileStorageService = fileInfoService.fileStorageService,
               ec                 = ec
             ).map(_ => ())

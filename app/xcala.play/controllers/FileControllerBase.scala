@@ -1,7 +1,7 @@
 package xcala.play.controllers
 
 import xcala.play.cross.controllers.ImageRendererController
-import xcala.play.cross.services.ImagePreResizingService
+import xcala.play.cross.services.ImageTranscodingService
 import xcala.play.cross.utils.LazyInjector
 import xcala.play.models._
 import xcala.play.services._
@@ -60,8 +60,8 @@ private[controllers] trait FileControllerBase
   implicit val configuration   : Configuration
   implicit val mat             : Materializer
 
-  lazy val imagePreResizingService: ImagePreResizingService =
-    LazyInjector.injector.instanceOf[ImagePreResizingService]
+  lazy val imageTranscodingService: ImageTranscodingService =
+    LazyInjector.injector.instanceOf[ImageTranscodingService]
 
   def defaultInternalServerError(implicit adminRequest: RequestType[_]): Result
 
@@ -134,7 +134,7 @@ private[controllers] trait FileControllerBase
           case Right(fileId) =>
             {
               if (handlePreResizes && fileInfo.isImage) {
-                imagePreResizingService.uploadPreResizesByFileObjectName(
+                imageTranscodingService.uploadPreResizesByFileObjectName(
                   fileObjectName = fileId
                 )
               } else {
