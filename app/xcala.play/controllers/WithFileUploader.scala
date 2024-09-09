@@ -50,7 +50,7 @@ trait WithFileUploader extends CrossWithFileUploader[BSONObjectID] {
       case Right(fileId) =>
         if (handlePreResizes) {
           handleNewPreResizes(
-            maybeOldModel = maybeOldModel.asInstanceOf[Option[CrossPreResizedImageHolder[BSONObjectID]]],
+            maybeOldModel = maybeOldModel.asInstanceOf[Option[PreResizedImageHolder[BSONObjectID]]],
             newFileId     = fileId
           ).map(_.map(_ => Some(fileId)))
 

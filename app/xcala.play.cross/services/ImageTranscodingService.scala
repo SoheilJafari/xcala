@@ -251,7 +251,7 @@ class ImageTranscodingService(
   }
 
   def uploadPreResizes[Id](
-      preResizedImageHolder: CrossPreResizedImageHolder[Id]
+      preResizedImageHolder: PreResizedImageHolder[Id]
   ): Future[Either[String, Unit]] =
     preResizedImageHolder.maybeImageFileId match {
       case Some(fileObjectName) =>
@@ -271,7 +271,7 @@ class ImageTranscodingService(
     }
 
   def removePreResizes[Id](
-      preResizedImageHolder: CrossPreResizedImageHolder[Id]
+      preResizedImageHolder: PreResizedImageHolder[Id]
   )(
       implicit
       fileStorageService   : FileStorageService,

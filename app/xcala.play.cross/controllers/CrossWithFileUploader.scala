@@ -112,7 +112,7 @@ trait CrossWithFileUploader[Id] extends WithExecutionContext {
         case None        => false
         case Some(value) =>
           value match {
-            case _: CrossPreResizedImageHolder[_] =>
+            case _: PreResizedImageHolder[_] =>
               true
             case _ =>
               false
@@ -284,7 +284,7 @@ trait CrossWithFileUploader[Id] extends WithExecutionContext {
       }
   }
 
-  protected def handleNewPreResizes[A <: CrossPreResizedImageHolder[Id]](
+  protected def handleNewPreResizes[A <: PreResizedImageHolder[Id]](
       maybeOldModel: Option[A],
       newFileId    : Id
   ): Future[Either[String, Unit]] = {
@@ -318,7 +318,7 @@ trait CrossWithFileUploader[Id] extends WithExecutionContext {
         Future.successful(())
       case Some(value) =>
         value match {
-          case preResizedImageHolder: CrossPreResizedImageHolder[_] =>
+          case preResizedImageHolder: PreResizedImageHolder[_] =>
             imageTranscodingService.removePreResizes(preResizedImageHolder)(
               fileStorageService = fileInfoService.fileStorageService,
               ec                 = ec

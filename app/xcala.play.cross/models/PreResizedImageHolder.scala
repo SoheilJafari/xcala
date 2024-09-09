@@ -1,5 +1,5 @@
 package xcala.play.cross.models
 
-trait CrossPreResizedImageHolder[Id] {
+trait PreResizedImageHolder[Id] {
   def maybeImageFileId: Option[Id]
 }
