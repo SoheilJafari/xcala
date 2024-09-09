@@ -64,7 +64,7 @@ class ImageTranscodingService(
   import ImageTranscodingService._
 
   private val bootstrapServer: String = configuration.get[String]("kafka.bootstrapServer")
-  private val requestTopic   : String = configuration.get[String]("kafka.imageTranscodingRequestTopic")
+  private val requestTopic   : String = "image-transcoding-requests"
 
   private lazy val consumerConfigs: Config = configuration.underlying.getConfig("akka.kafka.consumer")
   private lazy val producerConfigs: Config = configuration.underlying.getConfig("akka.kafka.producer")
