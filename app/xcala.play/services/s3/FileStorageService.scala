@@ -3,7 +3,6 @@ package xcala.play.services.s3
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
-import java.util.Arrays
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -13,7 +12,6 @@ import scala.jdk.CollectionConverters._
 import scala.jdk.FutureConverters._
 import scala.util.Failure
 import scala.util.Success
-
 import io.minio.BucketExistsArgs
 import io.minio.GetObjectArgs
 import io.minio.ListObjectsArgs
@@ -26,6 +24,8 @@ import io.sentry.Sentry
 import okhttp3.ConnectionPool
 import okhttp3.OkHttpClient
 import okhttp3.Protocol
+
+import java.util
 
 object FileStorageService {
 
@@ -47,10 +47,8 @@ class FileStorageService @Inject() (
 
   import FileStorageService._
 
-  private lazy val baseURL   : String = config.get[String]("fileStorage.s3.baseUrl")
-  private lazy val bucketName: String = config.get[String]("fileStorage.s3.bucketName")
-
-  lazy val fileStorageUrl: String = s"$baseURL/$bucketName"
+  private lazy val baseURL: String = config.get[String]("fileStorage.s3.baseUrl")
+  lazy val bucketName     : String = config.get[String]("fileStorage.s3.bucketName")
 
   /** Upload file to default bucket and the given path
     *
@@ -200,7 +198,7 @@ class FileStorageService @Inject() (
           item.objectName().replace(cleanPath, "")
         }
         .toList
-    }.recoverWith { case (e: Throwable) =>
+    }.recoverWith { case e: Throwable =>
       Sentry.captureException(e)
       Future.successful(List.empty[String])
     }
@@ -232,7 +230,7 @@ class FileStorageService @Inject() (
     .writeTimeout(TimeUnit.SECONDS.toMillis(60), TimeUnit.MILLISECONDS)
     .readTimeout(TimeUnit.SECONDS.toMillis(60), TimeUnit.MILLISECONDS)
     .connectionPool(new ConnectionPool(10, 15, TimeUnit.SECONDS))
-    .protocols(Arrays.asList(Protocol.HTTP_1_1))
+    .protocols(util.Arrays.asList(Protocol.HTTP_1_1))
     .build()
 
   /** Make S3 client object

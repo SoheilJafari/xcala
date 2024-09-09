@@ -50,7 +50,7 @@ trait ImageRendererController extends WithExecutionContext {
 
             val bos = new ByteArrayOutputStream()
             getImageWriter(contentType).write(outImage, ImageMetadata.fromImage(outImage), bos)
-            Source.single(ByteString(bos.toByteArray()))
+            Source.single(ByteString(bos.toByteArray))
           }
         }
       }

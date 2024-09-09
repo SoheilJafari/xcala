@@ -32,7 +32,7 @@ trait WithFileUploader extends CrossWithFileUploader[BSONObjectID] {
       filePart        : MultipartFormData.FilePart[TemporaryFile],
       maybeOldModel   : Option[A],
       handlePreResizes: Boolean
-  ): Future[Option[BSONObjectID]] = {
+  ): Future[Either[String, Option[BSONObjectID]]] = {
     val fileExtension = FilenameUtils.getExtension(filePart.filename)
 
     val fileInfo = FileInfo(
@@ -48,24 +48,18 @@ trait WithFileUploader extends CrossWithFileUploader[BSONObjectID] {
     val fileContentByteArray = readAllBytes(filePart.ref.path)
     fileInfoService.upload(fileInfo, fileContentByteArray).flatMap {
       case Right(fileId) =>
-        {
-          if (handlePreResizes) {
+        if (handlePreResizes) {
+          handleNewPreResizes(
+            maybeOldModel = maybeOldModel.asInstanceOf[Option[PreResizedImageHolder[BSONObjectID]]],
+            newFileId     = fileId
+          ).map(_.map(_ => Some(fileId)))
 
-            handleNewPreResizes(
-              maybeOldModel  = maybeOldModel.asInstanceOf[Option[CrossPreResizedImageHolder[BSONObjectID]]],
-              newFileId      = fileId,
-              newFileContent = fileContentByteArray,
-              newFileName    = fileInfo.name
-            )
-
-          } else {
-            Future.successful(())
-          }
-        }.map { _ =>
-          Some(fileId)
+        } else {
+          Future.successful(Right(Some(fileId)))
         }
-      case _             =>
-        Future.successful(None)
+
+      case _ =>
+        Future.successful(Right(None))
     }
   }
 
