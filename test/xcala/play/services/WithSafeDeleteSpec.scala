@@ -19,7 +19,7 @@ import reactivemongo.api.bson.Macros.Annotations.Key
 
 class WithSafeDeleteSpec(cmd: CommandLine) extends Specification {
 
-  val configFilePath =
+  val configFilePath: String =
     cmd.arguments.find(_.startsWith("-Dtest.config")).map(_.split("=")(1)).getOrElse("./conf/local-test.conf")
 
   val configuration: Configuration =
@@ -36,7 +36,7 @@ class WithSafeDeleteSpec(cmd: CommandLine) extends Specification {
 
     }
 
-  val hostName = configuration.get[String]("mongodbHost")
+  val hostName: String = configuration.get[String]("mongodbHost")
 
   import WithSafeDeleteSpecHelpers._
   import xcala.play.helpers.FutureHelpers._

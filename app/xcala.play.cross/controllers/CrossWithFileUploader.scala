@@ -3,8 +3,9 @@ package xcala.play.cross.controllers
 import xcala.play.controllers.WithFileUploader.AutoUploadSuffix
 import xcala.play.cross.models._
 import xcala.play.cross.services._
+import xcala.play.cross.services.ImageTranscodingService
+import xcala.play.cross.utils.LazyInjector
 import xcala.play.services.s3.FileStorageService
-import xcala.play.utils.ImagePreResizingUtils
 import xcala.play.utils.TikaMimeDetector
 import xcala.play.utils.WithExecutionContext
 
@@ -15,7 +16,6 @@ import play.api.libs.Files.TemporaryFile
 import play.api.mvc.MultipartFormData
 import play.api.mvc.Request
 
-import java.io.ByteArrayInputStream
 import scala.concurrent.Future
 import scala.util.Failure
 import scala.util.Success
@@ -27,6 +27,9 @@ trait CrossWithFileUploader[Id] extends WithExecutionContext {
   protected val fileInfoService: CrossFileInfoService[Id, _]
 
   protected type KeyValuesPair = (String, Seq[String])
+
+  lazy val imageTranscodingService: ImageTranscodingService =
+    LazyInjector.injector.instanceOf[ImageTranscodingProviderService].transcodingService
 
   protected def isAutoUpload(f: MultipartFormData.FilePart[TemporaryFile]): Boolean =
     f.key.endsWith("." + AutoUploadSuffix)
@@ -109,7 +112,7 @@ trait CrossWithFileUploader[Id] extends WithExecutionContext {
         case None        => false
         case Some(value) =>
           value match {
-            case _: CrossPreResizedImageHolder[_] =>
+            case _: PreResizedImageHolder[_] =>
               true
             case _ =>
               false
@@ -197,17 +200,25 @@ trait CrossWithFileUploader[Id] extends WithExecutionContext {
           filePart         = filePart,
           maybeOldModel    = maybeOldModel,
           handlePreResizes = handlePreResizes
-        ).map {
-          case Some(fileId) =>
-            fieldName ->
-              Seq(
-                fileId match {
-                  case x: BSONObjectID => x.stringify
-                  case x => x.toString()
-                }
-              )
-          case None         =>
-            "" -> Seq("")
+        ).flatMap {
+          case Left(error)  =>
+            Future.failed(new Throwable(error))
+          case Right(value) =>
+            Future.successful {
+              value match {
+                case Some(fileId) =>
+                  fieldName ->
+                    Seq(
+                      fileId match {
+                        case x: BSONObjectID => x.stringify
+                        case x => x.toString
+                      }
+                    )
+                case None         =>
+                  "" -> Seq("")
+              }
+            }
+
         }
       }
 
@@ -273,33 +284,29 @@ trait CrossWithFileUploader[Id] extends WithExecutionContext {
       }
   }
 
-  protected def handleNewPreResizes[A <: CrossPreResizedImageHolder[Id]](
-      maybeOldModel : Option[A],
-      newFileId     : Id,
-      newFileContent: Array[Byte],
-      newFileName   : String
-  ): Future[Unit] = {
+  protected def handleNewPreResizes[A <: PreResizedImageHolder[Id]](
+      maybeOldModel: Option[A],
+      newFileId    : Id
+  ): Future[Either[String, Unit]] = {
     implicit val fileStorageService: FileStorageService = fileInfoService.fileStorageService
     if (!maybeOldModel.map(_.maybeImageFileId).contains[Option[Id]](Some(newFileId))) {
       for {
         _ <- maybeOldModel.map { oldModel =>
           // removing old model resize images
-          ImagePreResizingUtils.removePreResizes(oldModel)
+          imageTranscodingService.removePreResizes(oldModel)
 
         }.getOrElse {
           Future.successful(())
         }
 
-        _ <- ImagePreResizingUtils.uploadPreResizesRaw(
-          imageFileId      = newFileId,
-          fileContent      = new ByteArrayInputStream(newFileContent),
-          fileOriginalName = newFileName
+        resizingResult <- imageTranscodingService.uploadPreResizesByFileObjectName(
+          fileObjectName = newFileId
         )
 
-      } yield ()
+      } yield resizingResult
 
     } else {
-      Future.successful(())
+      Future.successful(Right(()))
     }
   }
 
@@ -311,8 +318,8 @@ trait CrossWithFileUploader[Id] extends WithExecutionContext {
         Future.successful(())
       case Some(value) =>
         value match {
-          case preResizedImageHolder: CrossPreResizedImageHolder[_] =>
-            ImagePreResizingUtils.removePreResizes(preResizedImageHolder)(
+          case preResizedImageHolder: PreResizedImageHolder[_] =>
+            imageTranscodingService.removePreResizes(preResizedImageHolder)(
               fileStorageService = fileInfoService.fileStorageService,
               ec                 = ec
             ).map(_ => ())
@@ -329,6 +336,6 @@ trait CrossWithFileUploader[Id] extends WithExecutionContext {
       filePart        : MultipartFormData.FilePart[TemporaryFile],
       maybeOldModel   : Option[A],
       handlePreResizes: Boolean
-  ): Future[Option[Id]]
+  ): Future[Either[String, Option[Id]]]
 
 }

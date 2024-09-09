@@ -59,7 +59,6 @@ class TaskService @Inject() (
               "lastUpdateTime" -> DateTime.now()
             )
         ),
-      multi         = false,
       setUpdateTime = false
     )
 

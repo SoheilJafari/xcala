@@ -32,12 +32,12 @@ trait WithFileUploader extends CrossWithFileUploader[UUID] {
       filePart        : MultipartFormData.FilePart[TemporaryFile],
       maybeOldModel   : Option[A],
       handlePreResizes: Boolean
-  ): Future[Option[UUID]] = {
+  ): Future[Either[String, Option[UUID]]] = {
     val fileExtension = FilenameUtils.getExtension(filePart.filename)
 
     val fileInfo = FileInfo(
       name        = filePart.filename,
-      fileName    = java.util.UUID.randomUUID().toString() + fileExtension,
+      fileName    = java.util.UUID.randomUUID().toString + fileExtension,
       extension   = fileExtension,
       contentType = filePart.contentType.getOrElse("unknown"),
       length      = filePart.ref.path.toFile.length,
@@ -49,24 +49,19 @@ trait WithFileUploader extends CrossWithFileUploader[UUID] {
     val fileContentByteArray = readAllBytes(filePart.ref.path)
     fileInfoService.upload(fileInfo, fileContentByteArray).flatMap {
       case Right(fileId) =>
-        {
-          if (handlePreResizes) {
+        if (handlePreResizes) {
 
-            handleNewPreResizes(
-              maybeOldModel  = maybeOldModel.asInstanceOf[Option[CrossPreResizedImageHolder[UUID]]],
-              newFileId      = fileId,
-              newFileContent = fileContentByteArray,
-              newFileName    = fileInfo.name
-            )
+          handleNewPreResizes(
+            maybeOldModel = maybeOldModel.asInstanceOf[Option[PreResizedImageHolder[UUID]]],
+            newFileId     = fileId
+          ).map(_.map(_ => Some(fileId)))
 
-          } else {
-            Future.successful(())
-          }
-        }.map { _ =>
-          Some(fileId)
+        } else {
+          Future.successful(Right(Some(fileId)))
         }
-      case _             =>
-        Future.successful(None)
+
+      case _ =>
+        Future.successful(Right(None))
     }
   }
 

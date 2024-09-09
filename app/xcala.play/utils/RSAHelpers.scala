@@ -21,22 +21,22 @@ object RSAHelpers {
   }
 
   def getPrivateKeyFromXML(xml: String): PrivateKey = {
-    val doc = loadXMLFromString(xml);
+    val doc = loadXMLFromString(xml)
 
     val pkeyspec = new RSAPrivateKeySpec(
-      new BigInteger(1, b64.decode(doc.getElementsByTagName("Modulus").item(0).getTextContent())),
-      new BigInteger(1, b64.decode(doc.getElementsByTagName("D").item(0).getTextContent()))
+      new BigInteger(1, b64.decode(doc.getElementsByTagName("Modulus").item(0).getTextContent)),
+      new BigInteger(1, b64.decode(doc.getElementsByTagName("D").item(0).getTextContent))
     )
 
     val fact = KeyFactory.getInstance("RSA")
-    fact.generatePrivate(pkeyspec);
+    fact.generatePrivate(pkeyspec)
   }
 
   private def loadXMLFromString(xml: String): Document = {
-    val factory = DocumentBuilderFactory.newInstance();
-    val builder = factory.newDocumentBuilder();
-    val is      = new InputSource(new StringReader(xml));
-    builder.parse(is);
+    val factory = DocumentBuilderFactory.newInstance()
+    val builder = factory.newDocumentBuilder()
+    val is      = new InputSource(new StringReader(xml))
+    builder.parse(is)
   }
 
 }

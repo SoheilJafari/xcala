@@ -18,7 +18,7 @@ object TikaMimeDetector {
     val fis         = new FileInputStream(file)
     val result      =
       tika
-        .getDetector()
+        .getDetector
         .detect(TikaInputStream.get(fis), helpingMeta)
         .toString
 
@@ -32,7 +32,7 @@ object TikaMimeDetector {
     val helpingMeta = new Metadata()
 
     tika
-      .getDetector()
+      .getDetector
       .detect(TikaInputStream.get(byteArray), helpingMeta)
       .toString
 

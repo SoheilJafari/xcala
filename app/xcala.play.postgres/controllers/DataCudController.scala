@@ -100,7 +100,7 @@ trait DataCudController[Id, Entity <: EntityWithId[Id], Model]
   protected def recoverSaveError(throwable: Throwable, filledForm: Form[Model])(implicit
       request: RequestType[_]
   ): Future[Result] = {
-    createView(filledForm.withGlobalError(throwable.getMessage()))
+    createView(filledForm.withGlobalError(throwable.getMessage))
   }
 
   def delete(id: Id): Action[AnyContent] = action.async { implicit request =>

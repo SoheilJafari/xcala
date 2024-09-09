@@ -69,7 +69,7 @@ object BSONHandlers {
         Range(from = doc.getAsOpt[A]("from"), to = doc.getAsOpt[A]("to"))
       }
 
-      def writeTry(range: Range[Option[A]]) = Try {
+      def writeTry(range: Range[Option[A]]): Try[BSONDocument] = Try {
         BSONDocument(
           Seq(
             range.from.flatMap(handler.writeOpt).map("from" -> _),

@@ -1,10 +1,12 @@
 package xcala.play.controllers
 
-import xcala.play.cross
+import xcala.play.cross.controllers.ImageRendererController
+import xcala.play.cross.services.ImageTranscodingService
+import xcala.play.cross.utils.LazyInjector
 import xcala.play.models._
 import xcala.play.services._
 import xcala.play.utils.BaseStorageUrls
-import xcala.play.utils.ImagePreResizingUtils
+import xcala.play.utils.WithExecutionContext
 
 import akka.actor.ActorSystem
 import akka.stream.IOResult
@@ -28,7 +30,6 @@ import play.api.mvc.InjectedController
 import play.api.mvc.MultipartFormData
 import play.api.mvc.Result
 
-import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.net.SocketTimeoutException
 import java.nio.file.Files.readAllBytes
@@ -47,7 +48,8 @@ private[controllers] trait FileControllerBase
     extends InjectedController
     with WithComposableActions
     with I18nSupport
-    with cross.controllers.ImageRendererController {
+    with WithExecutionContext
+    with ImageRendererController {
 
   implicit val messagesProvider: Messages
   val fileInfoService          : FileInfoService
@@ -57,6 +59,9 @@ private[controllers] trait FileControllerBase
   val actorSystem              : ActorSystem
   implicit val configuration   : Configuration
   implicit val mat             : Materializer
+
+  lazy val imageTranscodingService: ImageTranscodingService =
+    LazyInjector.injector.instanceOf[ImageTranscodingService]
 
   def defaultInternalServerError(implicit adminRequest: RequestType[_]): Result
 
@@ -129,13 +134,8 @@ private[controllers] trait FileControllerBase
           case Right(fileId) =>
             {
               if (handlePreResizes && fileInfo.isImage) {
-                ImagePreResizingUtils.uploadPreResizesRaw(
-                  imageFileId      = fileId,
-                  fileContent      = new ByteArrayInputStream(fileContentBytes),
-                  fileOriginalName = file.filename
-                )(
-                  ec                 = ec,
-                  fileStorageService = fileInfoService.fileStorageService
+                imageTranscodingService.uploadPreResizesByFileObjectName(
+                  fileObjectName = fileId
                 )
               } else {
                 Future.successful(())
