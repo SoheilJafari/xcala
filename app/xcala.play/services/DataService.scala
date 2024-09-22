@@ -152,6 +152,9 @@ trait DataReadSimpleServiceImpl[Doc <: DocumentWithId]
     )
   }
 
+  def findInIds(ids: Seq[BSONObjectID]): Future[List[Doc]] =
+    find(BSONDocument("_id" -> BSONDocument("$in" -> ids)))
+
   def distinct(fieldName: String, query: Option[BSONDocument] = None): Future[Seq[BSONValue]] = {
     val command = BSONDocument("distinct" -> collectionName, "key" -> fieldName, "query" -> query)
     dbFuture

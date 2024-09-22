@@ -2,7 +2,6 @@ package xcala.play.cross.services
 
 import xcala.play.cross.models._
 import xcala.play.cross.services.ImageTranscodingService.ResizeResultListenerActor.HandleIncomingResult
-import xcala.play.models.ImageRenders
 import xcala.play.services.s3.FileStorageService
 
 import akka.Done
@@ -53,13 +52,14 @@ import reactivemongo.api.bson.BSONObjectID
   DO NOT ADD SINGLETON
  */
 class ImageTranscodingService(
-    actorSystem       : ActorSystem,
-    configuration     : Configuration,
-    fileStorageService: FileStorageService
+    actorSystem         : ActorSystem,
+    configuration       : Configuration,
+    fileStorageService  : FileStorageService
 )(
     implicit
-    val ec            : ExecutionContext,
-    val mat           : Materializer
+    val ec              : ExecutionContext,
+    val mat             : Materializer,
+    val imageRenderSizes: Set[ImageResizedRenderType]
 ) {
   import ImageTranscodingService._
 
@@ -99,7 +99,7 @@ class ImageTranscodingService(
   private lazy val producerSink: Sink[ProducerRecord[String, String], Future[Done]] =
     Producer.plainSink(producerSettings)
 
-  implicit val timeout: Timeout = Timeout(30.seconds)
+  implicit val timeout: Timeout = Timeout(10.minutes)
 
   private val committerSettings: CommitterSettings =
     CommitterSettings(actorSystem)
@@ -184,79 +184,83 @@ class ImageTranscodingService(
 
   control.get().drainAndShutdown(streamCompletion)
 
-  def uploadPreResizesByFileObjectName[Id](
-      fileObjectName: Id
+  def uploadPreResizesByFileId[Id](
+      fileId: Id
   ): Future[Either[String, Unit]] = {
-    val fileObjectNameString: String =
-      fileObjectName match {
+    val fileIdString: String =
+      fileId match {
         case x: BSONObjectID => x.stringify
         case x => x.toString
       }
     fileStorageService.findByObjectName(
-      fileObjectNameString
-    ).flatMap { file =>
-      val (ids, jsons) = ImageRenders.ImageResizedRenderType.all.map { resizeType =>
-        ImageTranscodingRequest.create(
-          objectName       = fileObjectNameString,
-          bucketName       = fileStorageService.bucketName,
-          targetWidth      = resizeType.overriddenWidth,
-          fileOriginalName = file.originalName,
-          resizedImageName = resizeType.resizedObjectName(fileObjectNameString),
-          resultTopic      = clientResultTopic
-        )
-      }
-        .map(x => x.id -> Json.toJsObject(x).toString())
-        .unzip
+      fileIdString
+    )
+      .flatMap { file =>
+        val request: ImageTranscodingRequest =
+          ImageTranscodingRequest.create(
+            objectName                     = fileIdString,
+            bucketName                     = fileStorageService.bucketName,
+            targetWidthToResizedImageNames =
+              imageRenderSizes
+                .map { imageRenderSize =>
+                  imageRenderSize.overriddenWidth -> imageRenderSize.resizedObjectName(fileIdString)
+                }
+                .toMap,
+            fileOriginalName               = file.originalName,
+            resultTopic                    = clientResultTopic
+          )
 
-      val askingForAnswer = Future.traverse(ids) { id =>
-        (resizeResultListenerActor ? ResizeResultListenerActor.GetResult(id))
-          .mapTo[ImageTranscodingResponse]
-      }.map {
-        _.foldLeft(Set.empty[String]) {
-          case (previousErrors, currentResponse) =>
-            previousErrors ++ currentResponse.error.toSet
-        } match {
-          case x if x.isEmpty => Right(())
-          case x              => Left(x.mkString(","))
-        }
-      }
-      Source(jsons)
-        .map { json =>
-          new ProducerRecord[String, String](requestTopic, json)
-        }
-        .runWith(producerSink)
+        val requestInJson: String =
+          Json.toJsObject(request).toString()
 
-      askingForAnswer
-        .map { r =>
-          try {
-            file.content.close()
-          } catch {
-            case _: Throwable =>
-            /* do nothing */
+        val askingForAnswer: Future[Either[String, Unit]] =
+          (resizeResultListenerActor ? ResizeResultListenerActor.GetResult(request.id))
+            .mapTo[ImageTranscodingResponse]
+            .map {
+              case ImageTranscodingResponse(_, error) if error.isEmpty =>
+                Right(())
+              case ImageTranscodingResponse(_, error)                  =>
+                Left(error.mkString)
+
+            }
+
+        Source.single(requestInJson)
+          .map { json =>
+            new ProducerRecord[String, String](requestTopic, json)
           }
-          r
-        }
-        .recoverWith {
-          case e: Throwable =>
+          .runWith(producerSink)
+
+        askingForAnswer
+          .map { askingResult =>
             try {
               file.content.close()
             } catch {
               case _: Throwable =>
               /* do nothing */
             }
-            Future.failed(e)
-        }
+            askingResult
+          }
+          .recoverWith {
+            case e: Throwable =>
+              try {
+                file.content.close()
+              } catch {
+                case _: Throwable =>
+                /* do nothing */
+              }
+              Future.failed(e)
+          }
 
-    }
+      }
   }
 
   def uploadPreResizes[Id](
       preResizedImageHolder: PreResizedImageHolder[Id]
   ): Future[Either[String, Unit]] =
     preResizedImageHolder.maybeImageFileId match {
-      case Some(fileObjectName) =>
-        uploadPreResizesByFileObjectName(
-          fileObjectName = fileObjectName
+      case Some(fileId) =>
+        uploadPreResizesByFileId(
+          fileId = fileId
         ).transformWith {
           case Failure(exception) =>
             Sentry.captureException(exception)
@@ -279,7 +283,7 @@ class ImageTranscodingService(
   ): Future[_] = {
     preResizedImageHolder.maybeImageFileId match {
       case Some(imageFileId) =>
-        Future.traverse(ImageRenders.ImageResizedRenderType.all) { allowedResize =>
+        Future.traverse(imageRenderSizes) { allowedResize =>
           val resizedFileName: String = allowedResize.resizedObjectName(
             imageFileId match {
               case x: BSONObjectID => x.stringify

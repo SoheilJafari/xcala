@@ -130,29 +130,33 @@ private[controllers] trait FileControllerBase
         )
         val fileContentBytes: Array[Byte] = readAllBytes(file.ref.path)
 
-        fileInfoService.upload(fileInfo, fileContentBytes).flatMap {
-          case Right(fileId) =>
-            {
-              if (handlePreResizes && fileInfo.isImage) {
-                imageTranscodingService.uploadPreResizesByFileObjectName(
-                  fileObjectName = fileId
-                )
-              } else {
-                Future.successful(())
-              }
-            }.map { _ =>
-              s"""{"id":"${fileId.stringify}", "label":"${fileInfo.name}", "url":"${if (fileInfo.isImage) {
-                  publicStorageUrls.publicImageUrl(id = fileId).absoluteURL()
+        fileInfoService.upload(fileInfo, fileContentBytes)
+          .flatMap {
+            case Right(fileId) =>
+              {
+                if (handlePreResizes && fileInfo.isImage) {
+                  imageTranscodingService.uploadPreResizesByFileId(
+                    fileId = fileId
+                  )
                 } else {
-                  publicStorageUrls.publicFileUrl(fileId).absoluteURL()
-                }}"}"""
-            }
+                  Future.successful(())
+                }
+              }
+                .map { _ =>
+                  s"""{"id":"${fileId.stringify}", "label":"${fileInfo.name}", "url":"${if (
+                      fileInfo.isImage
+                    ) {
+                      publicStorageUrls.publicImageUrl(id = fileId).absoluteURL()
+                    } else {
+                      publicStorageUrls.publicFileUrl(fileId).absoluteURL()
+                    }}"}"""
+                }
 
-          case Left(errorMessage) =>
-            val exception = new Throwable(errorMessage)
-            Sentry.captureException(exception)
-            Future.failed(exception)
-        }
+            case Left(errorMessage) =>
+              val exception = new Throwable(errorMessage)
+              Sentry.captureException(exception)
+              Future.failed(exception)
+          }
       }
     )
 
