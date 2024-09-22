@@ -299,8 +299,8 @@ trait CrossWithFileUploader[Id] extends WithExecutionContext {
           Future.successful(())
         }
 
-        resizingResult <- imageTranscodingService.uploadPreResizesByFileObjectName(
-          fileObjectName = newFileId
+        resizingResult <- imageTranscodingService.uploadPreResizesByFileId(
+          fileId = newFileId
         )
 
       } yield resizingResult
