@@ -2,7 +2,7 @@ name := """xcala.play"""
 
 organization := "com.xcala"
 
-version := "1.9.0"
+version := "1.9.1"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
@@ -44,7 +44,6 @@ libraryDependencies ++=
     "com.bahmanm"                  %% "persianutils"               % "5.0",
     "io.lemonlabs"                 %% "scala-uri"                  % "4.0.3",
     "org.apache.tika"               % "tika-core"                  % "2.9.2",
-    "ch.qos.logback"                % "logback-classic"            % "1.5.8",
     "io.sentry"                     % "sentry-logback"             % "7.14.0",
     "io.minio"                      % "minio"                      % "8.5.12",
     "commons-io"                    % "commons-io"                 % "2.17.0",
