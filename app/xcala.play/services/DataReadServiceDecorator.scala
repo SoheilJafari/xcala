@@ -93,7 +93,7 @@ object DataReadServiceDecorator {
       docToKeySet                 : Doc => Set[BSONObjectID],
       allKeysToKeySetToInnerModels: Set[BSONObjectID] => Future[Map[Set[BSONObjectID], Seq[InnerModel]]]
   )(
-      val innerModelIterableMapper    : Option[_] => IterableOnce[_]
+      val innerModelIterableMapper: Option[_] => IterableOnce[_]
   ) {
 
     def docsToAllKeySetToInnerModelsMap(docs: Seq[Doc]): Future[Map[Set[BSONObjectID], Seq[InnerModel]]] = {

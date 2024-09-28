@@ -16,7 +16,7 @@ import slick.jdbc.JdbcBackend
   */
 trait DataService {
   protected val dbConfig: DbConfig
-  protected val db: JdbcBackend#DatabaseDef = dbConfig.db
+  protected val db: JdbcBackend#Database = dbConfig.db
 }
 
 /** Service query functionality.
