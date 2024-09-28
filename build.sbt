@@ -2,7 +2,7 @@ name := """xcala.play"""
 
 organization := "com.xcala"
 
-version := "1.8.12"
+version := "1.9.0"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
@@ -36,33 +36,33 @@ libraryDependencies ++=
     "com.typesafe.akka"            %% "akka-stream-kafka"          % "4.0.2",
     "org.reactivemongo"            %% "reactivemongo"              % "1.0.10",
     "com.nappin"                   %% "play-recaptcha"             % "2.6",
-    "com.typesafe.akka"            %% "akka-actor-typed"           % "2.8.5",
-    "com.typesafe.akka"            %% "akka-testkit"               % "2.8.5" % "test",
-    "com.typesafe.akka"            %% "akka-serialization-jackson" % "2.8.5",
-    "com.typesafe.akka"            %% "akka-stream"                % "2.8.5",
-    "com.typesafe.akka"            %% "akka-slf4j"                 % "2.8.5",
+    "com.typesafe.akka"            %% "akka-actor-typed"           % "2.8.6",
+    "com.typesafe.akka"            %% "akka-testkit"               % "2.8.6" % "test",
+    "com.typesafe.akka"            %% "akka-serialization-jackson" % "2.8.6",
+    "com.typesafe.akka"            %% "akka-stream"                % "2.8.6",
+    "com.typesafe.akka"            %% "akka-slf4j"                 % "2.8.6",
     "com.bahmanm"                  %% "persianutils"               % "5.0",
     "io.lemonlabs"                 %% "scala-uri"                  % "4.0.3",
     "org.apache.tika"               % "tika-core"                  % "2.9.2",
-    "ch.qos.logback"                % "logback-classic"            % "1.5.6",
-    "io.sentry"                     % "sentry-logback"             % "7.9.0",
-    "io.minio"                      % "minio"                      % "8.5.10",
-    "commons-io"                    % "commons-io"                 % "2.15.1",
-    "com.sksamuel.scrimage"        %% "scrimage-scala"             % "4.1.3",
-    "com.sksamuel.scrimage"         % "scrimage-webp"              % "4.1.3",
-    "com.fasterxml.jackson.module" %% "jackson-module-scala"       % "2.17.1",
-    "org.postgresql"                % "postgresql"                 % "42.7.3",
+    "ch.qos.logback"                % "logback-classic"            % "1.5.8",
+    "io.sentry"                     % "sentry-logback"             % "7.14.0",
+    "io.minio"                      % "minio"                      % "8.5.12",
+    "commons-io"                    % "commons-io"                 % "2.17.0",
+    "com.sksamuel.scrimage"        %% "scrimage-scala"             % "4.2.0",
+    "com.sksamuel.scrimage"         % "scrimage-webp"              % "4.2.0",
+    "com.fasterxml.jackson.module" %% "jackson-module-scala"       % "2.17.2",
+    "org.postgresql"                % "postgresql"                 % "42.7.4",
     "com.typesafe.play"            %% "play-slick"                 % "5.2.0",
     "com.github.tototoshi"         %% "slick-joda-mapper"          % "2.9.1",
     "com.github.tminglei"          %% "slick-pg"                   % "0.21.1",
     "com.lightbend.akka"           %% "akka-stream-alpakka-slick"  % "6.0.2",
     "com.ibm.icu"                   % "icu4j"                      % "75.1",
-    "com.typesafe.play"            %% "play-json"                  % "2.10.4",
-    "com.typesafe.play"            %% "play-json-joda"             % "2.10.4",
+    "com.typesafe.play"            %% "play-json"                  % "2.10.6",
+    "com.typesafe.play"            %% "play-json-joda"             % "2.10.6",
     specs2                          % Test
   )
 
-ThisBuild / scapegoatVersion := "2.1.6"
+ThisBuild / scapegoatVersion := "3.0.0"
 
 scapegoatIgnoredFiles :=
   Seq(
@@ -125,7 +125,7 @@ Test / javaOptions ++= Seq("--add-opens=java.base/java.lang=ALL-UNNAMED")
 if (sys.props.getOrElse("ci", "") != "true") {
   new Def.SettingList(
     Seq(
-      addCompilerPlugin("org.scalameta" % "semanticdb-scalac" % "4.9.5" cross CrossVersion.full),
+      addCompilerPlugin("org.scalameta" % "semanticdb-scalac" % "4.10.1" cross CrossVersion.full),
       scalacOptions ++=
         List(
           "-Yrangepos",

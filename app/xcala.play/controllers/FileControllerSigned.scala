@@ -253,6 +253,11 @@ trait FileControllerSigned extends FileControllerBase {
       id       : BSONObjectID,
       signature: String
   ): Action[AnyContent] =
-    getFile(unverifiedId = id, signature = signature, protectedAccess = false, expireTime = None)
+    getFile(
+      unverifiedId    = id,
+      signature       = signature,
+      protectedAccess = false,
+      expireTime      = None
+    )
 
 }

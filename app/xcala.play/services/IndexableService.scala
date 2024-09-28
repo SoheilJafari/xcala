@@ -71,7 +71,7 @@ trait IndexableService[Doc <: DocumentWithId with Indexable]
         )
 
     existingItem
-      .map{ existingItem: Option[IndexedItem] =>
+      .map { existingItem: Option[IndexedItem] =>
         updateOrNewIndexedItem(indexedItem = existingItem, id = id, model = model)
       }
       .flatMap { indexedItem: IndexedItem =>

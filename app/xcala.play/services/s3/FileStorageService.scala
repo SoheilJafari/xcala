@@ -3,6 +3,7 @@ package xcala.play.services.s3
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
+import java.util
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -12,6 +13,7 @@ import scala.jdk.CollectionConverters._
 import scala.jdk.FutureConverters._
 import scala.util.Failure
 import scala.util.Success
+
 import io.minio.BucketExistsArgs
 import io.minio.GetObjectArgs
 import io.minio.ListObjectsArgs
@@ -24,8 +26,6 @@ import io.sentry.Sentry
 import okhttp3.ConnectionPool
 import okhttp3.OkHttpClient
 import okhttp3.Protocol
-
-import java.util
 
 object FileStorageService {
 
