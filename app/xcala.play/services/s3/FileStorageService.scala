@@ -1,5 +1,8 @@
 package xcala.play.services.s3
 
+import akka.NotUsed
+import akka.stream.scaladsl.Source
+
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -202,6 +205,29 @@ class FileStorageService @Inject() (
       Sentry.captureException(e)
       Future.successful(List.empty[String])
     }
+
+  def filesStream(path: Option[String] = None): Source[String, NotUsed] = {
+    val cleanPath = getCleanPath(path)
+
+    Source.fromIterator { () =>
+      getClient
+        .listObjects(
+          ListObjectsArgs
+            .builder()
+            .bucket(defaultBucketName)
+            .prefix(cleanPath)
+            .recursive(true)
+            .build()
+        )
+        .asScala
+        .map(x => Option(x.get()))
+        .collect { case Some(item) =>
+          item.objectName().replace(cleanPath, "")
+        }
+        .iterator
+    }
+
+  }
 
   /** It makes the default bucket if it doesn't exists
     *
