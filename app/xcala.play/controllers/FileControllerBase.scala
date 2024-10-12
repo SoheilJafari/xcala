@@ -1,6 +1,7 @@
 package xcala.play.controllers
 
 import xcala.play.cross.controllers.ImageRendererController
+import xcala.play.cross.services.ImageTranscodingProviderService
 import xcala.play.cross.services.ImageTranscodingService
 import xcala.play.cross.utils.LazyInjector
 import xcala.play.models._
@@ -61,7 +62,7 @@ private[controllers] trait FileControllerBase
   implicit val mat             : Materializer
 
   lazy val imageTranscodingService: ImageTranscodingService =
-    LazyInjector.injector.instanceOf[ImageTranscodingService]
+    LazyInjector.injector.instanceOf[ImageTranscodingProviderService].transcodingService
 
   def defaultInternalServerError(implicit adminRequest: RequestType[_]): Result
 
