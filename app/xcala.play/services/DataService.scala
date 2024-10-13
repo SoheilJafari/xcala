@@ -41,6 +41,19 @@ trait DataCollectionService extends DatabaseAccess {
 
   protected def onCollectionInitialized(collection: BSONCollection): Unit = {}
 
+  def distinct(fieldName: String, query: Option[BSONDocument] = None): Future[Seq[BSONValue]] = {
+    val command = BSONDocument("distinct" -> collectionName, "key" -> fieldName, "query" -> query)
+    dbFuture
+      .flatMap(
+        _.runCommand(command, FailoverStrategy.default).cursor[BSONDocument](
+          ReadPreference.primaryPreferred
+        ).head
+      )
+      .map { doc =>
+        doc.getAsOpt[BSONArray]("values").toSeq.flatMap(_.values)
+      }
+  }
+
 }
 
 trait WithDbCommand extends DatabaseAccess {
@@ -154,19 +167,6 @@ trait DataReadSimpleServiceImpl[Doc <: DocumentWithId]
 
   def findInIds(ids: Seq[BSONObjectID]): Future[List[Doc]] =
     find(BSONDocument("_id" -> BSONDocument("$in" -> ids)))
-
-  def distinct(fieldName: String, query: Option[BSONDocument] = None): Future[Seq[BSONValue]] = {
-    val command = BSONDocument("distinct" -> collectionName, "key" -> fieldName, "query" -> query)
-    dbFuture
-      .flatMap(
-        _.runCommand(command, FailoverStrategy.default).cursor[BSONDocument](
-          ReadPreference.primaryPreferred
-        ).head
-      )
-      .map { doc =>
-        doc.getAsOpt[BSONArray]("values").toSeq.flatMap(_.values)
-      }
-  }
 
   protected def applyDefaultSort(sortInfos: Seq[SortInfo]): Seq[SortInfo] =
     sortInfos match {
