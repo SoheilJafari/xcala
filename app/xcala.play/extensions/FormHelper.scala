@@ -138,6 +138,10 @@ object FormHelper {
     mapping.transform[String](a => KeywordExtractor.removeSpecialCharacters(a.trim), a => a)
   }
 
+  def removeTicketSpecialCharacters(mapping: Mapping[String]): Mapping[String] = {
+    mapping.transform[String](a => KeywordExtractor.removeTicketSpecialCharacters(a.trim), a => a)
+  }
+
   implicit class AdvancedForm[A](val form: Form[A]) extends AnyVal {
 
     def withErrorIf(hasError: Boolean, key: String, error: String, args: Any*): Form[A] = {
