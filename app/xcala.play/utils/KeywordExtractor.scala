@@ -9,8 +9,7 @@ object KeywordExtractor {
   private final val breaks: Regex =
     ("""؟|\?|؛|!|%|:|=|#|,|،|-|_|\(|\)|\[|\]|\"|\'|/|<br.*>|[​-‍]|[<>]""" + s"|$BOM").r
 
-  private final val ticketBreaks: Regex =
-    ("""؟|\?|؛|!|%|=|#|_|\(|\)|\[|\]|\"|\'|/|<br.*>|[​-‍]|[<>]""" + s"|$BOM").r
+  private final val ticketBreaks: Regex = ("""%|#|_|\(|\)|\[|\]|\"|\'|<br.*>|[​-‍]|[<>]""" + s"|$BOM").r
 
   def getKeywords(text: String): Seq[String] = {
     val withSpace = breaks.replaceAllIn(text.toLowerCase(), " ")
