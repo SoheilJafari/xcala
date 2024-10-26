@@ -54,6 +54,17 @@ trait DataCollectionService extends DatabaseAccess {
       }
   }
 
+  def findCommand(query: BSONDocument): Future[BSONDocument] = {
+    val command =
+      BSONDocument("find" -> collectionName, "filter" -> query)
+    dbFuture
+      .flatMap(
+        _.runCommand(command, FailoverStrategy.default).cursor[BSONDocument](
+          ReadPreference.primaryPreferred
+        ).head
+      )
+  }
+
 }
 
 trait WithDbCommand extends DatabaseAccess {
