@@ -3,11 +3,13 @@ package xcala.play.postgres.services
 import xcala.play.models.{DataWithTotalCount, QueryOptions}
 import xcala.play.postgres.entities.TableDefinition
 import xcala.play.postgres.models.EntityWithId
+import xcala.play.postgres.utils.QueryHelpers._
 import xcala.play.utils.WithExecutionContext
 
 import play.api.mvc.Request
 
 import java.util.UUID
+import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 import slick.jdbc.JdbcBackend
@@ -31,6 +33,25 @@ trait DataQueryService[Id, Entity <: EntityWithId[Id]] extends DataService {
 
   protected def filterQueryById(id: Id): Query[TableDef, Entity, Seq]
   protected def mappedToIdColumnQuery: Query[Rep[Id], Id, Seq]
+
+  def distinct[F, G, T](
+      f             : tableDefinition.TableDef => Rep[Option[F]],
+      maybeCondition: Option[tableDefinition.TableDef => Rep[Boolean]] = None
+  )(
+      implicit
+      shape         : Shape[_ <: FlatShapeLevel, Rep[Option[F]], Option[T], G],
+      ec            : ExecutionContext
+  ): Future[Set[T]] =
+    db.run(
+      tableQuery
+        .optionalQuery { query =>
+          maybeCondition.map { condition =>
+            query.filter(condition)
+          }
+        }
+        .map(f)
+        .distinct.result
+    ).map(_.flatten.toSet)
 
 }
 
