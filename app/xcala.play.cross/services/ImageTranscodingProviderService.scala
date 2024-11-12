@@ -1,7 +1,7 @@
 package xcala.play.cross.services
 
 import xcala.play.cross.models.ImageResizedRenderType
-import xcala.play.services.s3.FileStorageService
+import xcala.play.cross.services.s3.FileStorageService
 
 import akka.actor.ActorSystem
 import akka.stream.Materializer

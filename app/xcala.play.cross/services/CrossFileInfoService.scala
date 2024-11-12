@@ -1,6 +1,6 @@
 package xcala.play.cross.services
 
-import xcala.play.services.s3.FileStorageService
+import xcala.play.cross.services.s3.FileStorageService
 
 import scala.concurrent.Future
 

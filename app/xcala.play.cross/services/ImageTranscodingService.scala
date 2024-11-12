@@ -2,7 +2,7 @@ package xcala.play.cross.services
 
 import xcala.play.cross.models._
 import xcala.play.cross.services.ImageTranscodingService.ResizeResultListenerActor.HandleIncomingResult
-import xcala.play.services.s3.FileStorageService
+import xcala.play.cross.services.s3.FileStorageService
 
 import akka.Done
 import akka.actor.Actor
@@ -184,6 +184,7 @@ class ImageTranscodingService(
 
   control.get().drainAndShutdown(streamCompletion)
 
+  @SuppressWarnings(Array("SwallowedException"))
   def uploadPreResizesByFileId[Id](
       fileId: Id
   ): Future[Either[String, Unit]] = {
@@ -235,7 +236,7 @@ class ImageTranscodingService(
             try {
               file.content.close()
             } catch {
-              case _: Throwable =>
+              case _: Throwable => ()
               /* do nothing */
             }
             askingResult
@@ -245,7 +246,7 @@ class ImageTranscodingService(
               try {
                 file.content.close()
               } catch {
-                case _: Throwable =>
+                case _: Throwable => ()
                 /* do nothing */
               }
               Future.failed(e)
