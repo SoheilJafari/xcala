@@ -5,7 +5,7 @@ import play.api.libs.json.OFormat
 
 import java.util.UUID
 
-case class ImageTranscodingResponse(
+final case class ImageTranscodingResponse(
     id   : UUID,
     error: Option[String]
 ) extends ImageTranscodingMessage

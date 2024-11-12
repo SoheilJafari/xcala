@@ -4,8 +4,8 @@ import xcala.play.controllers.WithFileUploader.AutoUploadSuffix
 import xcala.play.cross.models._
 import xcala.play.cross.services._
 import xcala.play.cross.services.ImageTranscodingService
+import xcala.play.cross.services.s3.FileStorageService
 import xcala.play.cross.utils.LazyInjector
-import xcala.play.services.s3.FileStorageService
 import xcala.play.utils.TikaMimeDetector
 import xcala.play.utils.WithExecutionContext
 

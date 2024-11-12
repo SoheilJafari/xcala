@@ -1,15 +1,13 @@
-package xcala.play.services.s3
+package xcala.play.cross.services.s3
 
 import akka.NotUsed
 import akka.stream.scaladsl.Source
 
 import java.io.File
 import java.io.FileOutputStream
-import java.io.InputStream
 import java.util
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 import scala.jdk.CollectionConverters._
@@ -30,43 +28,13 @@ import okhttp3.ConnectionPool
 import okhttp3.OkHttpClient
 import okhttp3.Protocol
 
-object FileStorageService {
-
-  final case class FileS3Object(
-      objectName   : String,
-      originalName : String,
-      content      : InputStream,
-      contentType  : Option[String],
-      contentLength: Option[Long],
-      path         : Option[String]
-  )
-
-}
-
-@Singleton
-class FileStorageService @Inject() (
-    config: play.api.Configuration
-)(implicit val ec: ExecutionContext) {
-
+class MinioFileStorageService @Inject() (
+    val config: play.api.Configuration
+)(implicit val ec: ExecutionContext) extends FileStorageService {
   import FileStorageService._
 
   private lazy val baseURL: String = config.get[String]("fileStorage.s3.baseUrl")
-  lazy val bucketName     : String = config.get[String]("fileStorage.s3.bucketName")
 
-  /** Upload file to default bucket and the given path
-    *
-    * @param objectName
-    *   String, File stored with this name in s3 and in our case it is UUID
-    * @param content
-    *   String, File content
-    * @param contentType
-    *   String
-    * @param originalName
-    *   String, extra info
-    * @param path
-    *   String, Path of s3, Ex: folder1/folder2/folder3/
-    * @return
-    */
   def upload(
       objectName  : String,
       content     : Array[Byte],
@@ -103,14 +71,6 @@ class FileStorageService @Inject() (
 
   }
 
-  /** Read file from s3
-    *
-    * @param objectName
-    *   String, name of file in s3. Ex: picture.jpg
-    * @param path
-    *   String, directory of the file. Ex: first/second/thirdFolder/
-    * @return
-    */
   def findByObjectName(objectName: String, path: Option[String] = None): Future[FileS3Object] = {
     val cleanPath = getCleanPath(path)
 
@@ -147,14 +107,6 @@ class FileStorageService @Inject() (
       Future.failed(e)
   }
 
-  /** Delete file by name and path
-    *
-    * @param objectName
-    *   String, file name, in our case it is fileEntity UUID
-    * @param path
-    *   String Ex: folder1/folder2/
-    * @return
-    */
   def deleteByObjectName(objectName: String, path: Option[String] = None): Future[Boolean] = {
     val cleanPath = getCleanPath(path)
     getClient
@@ -279,20 +231,5 @@ class FileStorageService @Inject() (
     */
   private def defaultBucketName: String =
     bucketName
-
-  /** Clean deformed path Ex: Some("folder1/") => folder1/ Some("folder1") => folder1/ Some("") => "" None =>
-    * ""
-    *
-    * @param path
-    *   Option[String]
-    * @return
-    */
-  private def getCleanPath(path: Option[String]): String = {
-    path match {
-      case Some(s) if s.nonEmpty && s.last == '/' => s
-      case Some(s) if s.nonEmpty                  => s.concat("/")
-      case _                                      => ""
-    }
-  }
 
 }

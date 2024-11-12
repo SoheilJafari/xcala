@@ -1,9 +1,9 @@
 package xcala.play.services
 
 import FileInfoService.FileObject
-import s3.FileStorageService
-import s3.FileStorageService.FileS3Object
 import xcala.play.cross.services.CrossFileInfoService
+import xcala.play.cross.services.s3.FileStorageService
+import xcala.play.cross.services.s3.FileStorageService.FileS3Object
 import xcala.play.extensions.BSONHandlers._
 import xcala.play.models.FileInfo
 import xcala.play.services.DataRemoveServiceImpl
