@@ -16,13 +16,13 @@ abstract class SortOptionsBase[A <: SortOptionsBase[_]](val sortExpression: Opti
 
   def sort(sortExpression: Option[String], addIdToSort: Boolean, resetPagination: Boolean = true): A = {
     sortExpression match {
-      case None       => resetSort(sortExpression = None, resetPagination)
+      case None => resetSort(sortExpression = None, resetPagination)
       case Some(sort) =>
         val existingSortInfo = sortInfos.find(s => s.field == sort)
 
         val newSortInfos: Seq[SortInfo] = {
           existingSortInfo match {
-            case Some(sortInfo) if sortInfo.direction == 1  =>
+            case Some(sortInfo) if sortInfo.direction == 1 =>
               // Toggle direction if exists and not descending
               sortInfos.map { sortInfo =>
                 if (sortInfo.field == sort) {
@@ -34,7 +34,7 @@ abstract class SortOptionsBase[A <: SortOptionsBase[_]](val sortExpression: Opti
             case Some(sortInfo) if sortInfo.direction == -1 =>
               // Remove sort info if it was descending
               sortInfos.filter(_ != sortInfo)
-            case _                                          =>
+            case _ =>
               // Add new one if not exists
               sortInfos :+ SortInfo(sort)
           }
@@ -48,7 +48,7 @@ abstract class SortOptionsBase[A <: SortOptionsBase[_]](val sortExpression: Opti
     sortInfos match {
       case Nil =>
         sort(sortExpression = Some(sortExpression), addIdToSort = addIdToSort, resetPagination = false)
-      case _   =>
+      case _ =>
         this.asInstanceOf[A]
     }
   }

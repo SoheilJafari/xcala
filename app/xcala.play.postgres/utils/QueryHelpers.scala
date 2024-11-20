@@ -17,7 +17,7 @@ object QueryHelpers {
         sortOptions    : SortOptionsBase[A],
         sortEnumeration: V
     )(
-        f              : E => sortEnumeration.Value => Seq[ColumnOrdered[_]]
+        f: E => sortEnumeration.Value => Seq[ColumnOrdered[_]]
     ): Query[E, U, C] = {
       sortOptions.sortInfos.foldLeft(query) { (q, sortInfo) =>
         try {
@@ -50,7 +50,7 @@ object QueryHelpers {
         queryOptions   : QueryOptions,
         sortEnumeration: V
     )(
-        f              : E => sortEnumeration.Value => ColumnOrdered[_]
+        f: E => sortEnumeration.Value => ColumnOrdered[_]
     ): Query[E, U, C] =
       multiSort(queryOptions, sortEnumeration)(f.andThen(_.andThen(Seq(_)))).paginated(queryOptions)
 
@@ -58,7 +58,7 @@ object QueryHelpers {
         queryOptions   : QueryOptions,
         sortEnumeration: V
     )(
-        f              : E => sortEnumeration.Value => Seq[ColumnOrdered[_]]
+        f: E => sortEnumeration.Value => Seq[ColumnOrdered[_]]
     ): Query[E, U, C] =
       multiSort(queryOptions, sortEnumeration)(f).paginated(queryOptions)
 

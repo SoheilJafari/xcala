@@ -33,7 +33,7 @@ object PersianUtils {
         faSeparator   : String  = "-",
         nonFaSeparator: String  = " "
     )(implicit
-        messages      : Messages
+        messages: Messages
     ): String = {
       if (messages.lang.code == "fa") {
         val gDate =
@@ -85,7 +85,7 @@ object PersianUtils {
         faSeparator   : String  = "-",
         nonFaSeparator: String  = " "
     )(implicit
-        messages      : Messages
+        messages: Messages
     ): Option[String] = Try {
       toGlobalDateTimeString(
         addTime        = addTime,

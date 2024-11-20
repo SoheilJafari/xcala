@@ -113,7 +113,7 @@ object BSONHandlers {
             Success(
               MultilangModel(lang = lang, value = value.asInstanceOf[A])
             )
-          case _                         => Failure(new NoSuchFieldException())
+          case _ => Failure(new NoSuchFieldException())
         }
       }
 
@@ -142,7 +142,7 @@ object BSONHandlers {
                 value = value.collect { case x: A => x }
               ) // implicit classTag defined above helps with erasure bug here
             )
-          case _                                              => Failure(new NoSuchFieldException())
+          case _ => Failure(new NoSuchFieldException())
         }
       }
 
@@ -168,7 +168,7 @@ object BSONHandlers {
             Success(
               MultilangModel(lang = lang, value = value)
             )
-          case _                         => Failure(new NoSuchFieldException())
+          case _ => Failure(new NoSuchFieldException())
         }
       }
 
@@ -194,7 +194,7 @@ object BSONHandlers {
             Success(
               MultilangModel(lang = lang, value = value)
             )
-          case _                   => Failure(new NoSuchFieldException())
+          case _ => Failure(new NoSuchFieldException())
         }
       }
 

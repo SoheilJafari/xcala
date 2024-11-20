@@ -205,7 +205,7 @@ trait DataSaveServiceImpl[Doc <: DocumentWithId]
     val fieldName = "_id"
     val doc       = documentHandler.writeOpt(model).get
     val objectId  = doc.getAsOpt[BSONObjectID](fieldName).getOrElse(BSONObjectID.generate())
-    val newDoc    = BSONDocument(
+    val newDoc = BSONDocument(
       doc.elements.filter(_.name != fieldName).map(e => (e.name, e.value)) :+ (fieldName -> objectId)
     )
     (newDoc, objectId)
@@ -223,7 +223,7 @@ trait DataSaveServiceImpl[Doc <: DocumentWithId]
 
   private def setCreateAndUpdateTime(doc: BSONDocument): BSONDocument = {
     // Set create time if it wasn't available
-    val createTime        = doc.getAsOpt[DateTime](DataCrudService.CreateTimeField).getOrElse(DateTime.now)
+    val createTime = doc.getAsOpt[DateTime](DataCrudService.CreateTimeField).getOrElse(DateTime.now)
     val docWithCreateTime = BSONDocument(
       doc.elements.filter(_.name != DataCrudService.CreateTimeField).map(e => (e.name, e.value)) :+
         (DataCrudService.CreateTimeField -> BSONDateTime(createTime.getMillis))
@@ -265,7 +265,7 @@ trait DataSaveServiceImpl[Doc <: DocumentWithId]
   ): Future[WriteResult] = {
     val finalUpdateDoc = setUpdateTime match {
       case false => update
-      case true  =>
+      case true =>
         val updateTime = DateTime.now
         update ++
           BSONDocument(

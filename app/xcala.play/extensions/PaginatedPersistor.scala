@@ -26,7 +26,7 @@ object PaginatedPersistor {
         keyName       : String      = "paginatedParams",
         additionalKeys: Set[String] = Set.empty[String]
     )(implicit
-        request       : RequestHeader
+        request: RequestHeader
     ): Call = {
       val keys: Set[String] = additionalKeys + keyName
 
@@ -42,7 +42,7 @@ object PaginatedPersistor {
                 attachQueryString(prevUrl, s"$nextKey=$stringValue")
 
             }
-          case _                                         => prevUrl
+          case _ => prevUrl
         }
 
       }

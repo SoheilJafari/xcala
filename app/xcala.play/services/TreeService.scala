@@ -31,7 +31,7 @@ trait TreeService[Doc <: DocumentWithId, Model <: TreeModelBase[BSONObjectID, Mo
 
       case (Some(id), None) =>
         initialDocument ++ BSONDocument("parentId" -> id)
-      case _                => throw new IllegalArgumentException
+      case _ => throw new IllegalArgumentException
     }
 
     findItemsUnder(query, initialDocument)

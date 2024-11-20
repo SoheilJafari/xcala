@@ -2,11 +2,11 @@ name := """xcala.play"""
 
 organization := "com.xcala"
 
-version := "1.10.3"
+version := "1.10.4"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
-scalaVersion := "2.13.14"
+scalaVersion := "2.13.15"
 
 resolvers ++=
   Seq(
@@ -43,26 +43,26 @@ libraryDependencies ++=
     "com.typesafe.akka"            %% "akka-slf4j"                 % "2.8.6",
     "com.bahmanm"                  %% "persianutils"               % "5.0",
     "io.lemonlabs"                 %% "scala-uri"                  % "4.0.3",
-    "org.apache.tika"               % "tika-core"                  % "2.9.2",
-    "io.sentry"                     % "sentry-logback"             % "7.14.0",
+    "org.apache.tika"               % "tika-core"                  % "3.0.0",
+    "io.sentry"                     % "sentry-logback"             % "7.18.0",
     "io.minio"                      % "minio"                      % "8.5.12",
     "commons-io"                    % "commons-io"                 % "2.17.0",
     "com.sksamuel.scrimage"        %% "scrimage-scala"             % "4.2.0",
     "com.sksamuel.scrimage"         % "scrimage-webp"              % "4.2.0",
-    "com.fasterxml.jackson.module" %% "jackson-module-scala"       % "2.17.2",
+    "com.fasterxml.jackson.module" %% "jackson-module-scala"       % "2.18.1",
     "org.postgresql"                % "postgresql"                 % "42.7.4",
     "com.typesafe.play"            %% "play-slick"                 % "5.2.0",
     "com.github.tototoshi"         %% "slick-joda-mapper"          % "2.9.1",
     "com.github.tminglei"          %% "slick-pg"                   % "0.21.1",
     "com.lightbend.akka"           %% "akka-stream-alpakka-slick"  % "6.0.2",
     "com.lightbend.akka"           %% "akka-stream-alpakka-s3"     % "6.0.2",
-    "com.ibm.icu"                   % "icu4j"                      % "75.1",
+    "com.ibm.icu"                   % "icu4j"                      % "76.1",
     "com.typesafe.play"            %% "play-json"                  % "2.10.6",
     "com.typesafe.play"            %% "play-json-joda"             % "2.10.6",
     specs2                          % Test
   )
 
-ThisBuild / scapegoatVersion := "3.0.0"
+ThisBuild / scapegoatVersion := "3.1.2"
 
 scapegoatIgnoredFiles :=
   Seq(
@@ -125,7 +125,7 @@ Test / javaOptions ++= Seq("--add-opens=java.base/java.lang=ALL-UNNAMED")
 if (sys.props.getOrElse("ci", "") != "true") {
   new Def.SettingList(
     Seq(
-      addCompilerPlugin("org.scalameta" % "semanticdb-scalac" % "4.10.1" cross CrossVersion.full),
+      addCompilerPlugin("org.scalameta" % "semanticdb-scalac" % "4.11.2" cross CrossVersion.full),
       scalacOptions ++=
         List(
           "-Yrangepos",

@@ -74,7 +74,7 @@ trait DataCudController[Id, Entity <: EntityWithId[Id], Model]
 
   def editPost(id: Id): Action[AnyContent] = action.async { implicit request =>
     cudService.findById(id).flatMap {
-      case None        => Future.successful(defaultNotFound)
+      case None => Future.successful(defaultNotFound)
       case Some(model) =>
         val boundForm  = defaultForm.fill(model)
         val filledForm = LanguageSafeFormBinding.bindForm(boundForm)

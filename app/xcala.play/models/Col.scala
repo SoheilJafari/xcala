@@ -50,7 +50,7 @@ object Col {
 
   def command[A](commands: (A => RowCommand)*)(implicit messages: Messages): Col[A] = {
     Col.fromOptionalField[A](
-      name                  = "",
+      name = "",
       maybeFieldValueMapper = (field: A) =>
         commands
           .map(_(field))
@@ -71,8 +71,8 @@ object Col {
           case nonEmpty =>
             Some(s"""<div class='btn-group'>${nonEmpty.mkString}</div>""")
         },
-      sortExpression        = "",
-      cssClass              = _ => Some("command-column")
+      sortExpression = "",
+      cssClass       = _ => Some("command-column")
     )
 
   }

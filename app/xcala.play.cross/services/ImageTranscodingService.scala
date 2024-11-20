@@ -52,9 +52,9 @@ import reactivemongo.api.bson.BSONObjectID
   DO NOT ADD SINGLETON
  */
 class ImageTranscodingService(
-    actorSystem         : ActorSystem,
-    configuration       : Configuration,
-    fileStorageService  : FileStorageService
+    actorSystem       : ActorSystem,
+    configuration     : Configuration,
+    fileStorageService: FileStorageService
 )(
     implicit
     val ec              : ExecutionContext,
@@ -137,7 +137,7 @@ class ImageTranscodingService(
                 .toOption
                 .flatten
             } match {
-              case None           =>
+              case None =>
                 Sentry.captureMessage("Invalid incoming json message from kafka")
                 ProducerMessage.passThrough[
                   String,
@@ -199,16 +199,16 @@ class ImageTranscodingService(
       .flatMap { file =>
         val request: ImageTranscodingRequest =
           ImageTranscodingRequest.create(
-            objectName                     = fileIdString,
-            bucketName                     = fileStorageService.bucketName,
+            objectName = fileIdString,
+            bucketName = fileStorageService.bucketName,
             targetWidthToResizedImageNames =
               imageRenderSizes
                 .map { imageRenderSize =>
                   imageRenderSize.overriddenWidth -> imageRenderSize.resizedObjectName(fileIdString)
                 }
                 .toMap,
-            fileOriginalName               = file.originalName,
-            resultTopic                    = clientResultTopic
+            fileOriginalName = file.originalName,
+            resultTopic      = clientResultTopic
           )
 
         val requestInJson: String =
@@ -220,7 +220,7 @@ class ImageTranscodingService(
             .map {
               case ImageTranscodingResponse(_, error) if error.isEmpty =>
                 Right(())
-              case ImageTranscodingResponse(_, error)                  =>
+              case ImageTranscodingResponse(_, error) =>
                 Left(error.mkString)
 
             }
@@ -279,8 +279,8 @@ class ImageTranscodingService(
       preResizedImageHolder: PreResizedImageHolder[Id]
   )(
       implicit
-      fileStorageService   : FileStorageService,
-      ec                   : ExecutionContext
+      fileStorageService: FileStorageService,
+      ec                : ExecutionContext
   ): Future[_] = {
     preResizedImageHolder.maybeImageFileId match {
       case Some(imageFileId) =>
@@ -299,7 +299,7 @@ class ImageTranscodingService(
               Future.successful(())
           }
         }
-      case _                 =>
+      case _ =>
         Future.successful(())
     }
 
@@ -325,7 +325,7 @@ object ImageTranscodingService {
 
       case HandleIncomingResult(imageTranscodingResponse) =>
         trackingIds.get(imageTranscodingResponse.id) match {
-          case None          =>
+          case None =>
             Sentry.captureMessage(
               "trackingId does not exists!"
             )

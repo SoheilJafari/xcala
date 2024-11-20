@@ -112,7 +112,7 @@ private[controllers] trait FileControllerBase
       body            : MultipartFormData[Files.TemporaryFile],
       handlePreResizes: Boolean = false
   )(implicit
-      requestHeader   : RequestHeader
+      requestHeader: RequestHeader
   ): Future[Result] = {
     val resultsFuture: Future[Seq[String]] = Future.sequence(
       body.files.sortBy(_.filename).map { file =>
@@ -182,7 +182,7 @@ private[controllers] trait FileControllerBase
         folderService.insert(Folder(id = None, name = folderName, parent = currentFolderIDOpt)).map(_ =>
           Ok("OK")
         )
-      case _                => Future.successful(BadRequest)
+      case _ => Future.successful(BadRequest)
     }
   }
 
@@ -192,7 +192,7 @@ private[controllers] trait FileControllerBase
     idOpt
       .map { id =>
         fileInfoService.findById(id).map {
-          case None       => Ok("{}")
+          case None => Ok("{}")
           case Some(file) =>
             Ok(
               Json.obj(
@@ -211,7 +211,7 @@ private[controllers] trait FileControllerBase
     val future = itemType match {
       case "folder" =>
         folderService.renameFolder(id, newName)
-      case "file"   =>
+      case "file" =>
         fileInfoService.renameFile(id, newName)
     }
 
@@ -224,13 +224,13 @@ private[controllers] trait FileControllerBase
     val future = itemType match {
       case "folder" =>
         folderService.removeFolder(id)
-      case "file"   =>
+      case "file" =>
         fileInfoService.removeFile(id).flatMap {
           case Left(errorMessage) =>
             val exception = new Throwable(errorMessage)
             Sentry.captureException(exception)
             Future.failed(exception)
-          case Right(value)       =>
+          case Right(value) =>
             Future.successful(Some(value))
         }
     }
@@ -301,7 +301,7 @@ private[controllers] trait FileControllerBase
       header = ResponseHeader(status = OK),
       body   = body
     ).withHeaders(
-      CONTENT_LENGTH      -> contentLength.map(_.toString).getOrElse(""),
+      CONTENT_LENGTH -> contentLength.map(_.toString).getOrElse(""),
       CONTENT_DISPOSITION ->
         (s"""$dispositionMode; filename="${java.net.URLEncoder
             .encode(fileName, "UTF-8")

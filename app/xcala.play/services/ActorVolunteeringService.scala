@@ -14,7 +14,7 @@ import reactivemongo.api.bson.collection._
 class ActorVolunteeringService @Inject() (
     databaseConfig: DefaultDatabaseConfig
 )(implicit
-    val ec        : ExecutionContext
+    val ec: ExecutionContext
 ) {
 
   private lazy val dbFuture: Future[DB] = databaseConfig.databaseFuture

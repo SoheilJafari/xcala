@@ -5,7 +5,7 @@ import java.security.MessageDigest
 object MD5 {
 
   def hash(input: String): String = {
-    val md     = MessageDigest.getInstance("MD5")
+    val md = MessageDigest.getInstance("MD5")
     md.update(input.getBytes)
     val hash   = BigInt(1, md.digest())
     val result = hash.toString(16)

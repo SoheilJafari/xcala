@@ -15,8 +15,8 @@ object TikaMimeDetector {
     // otherwise Tika might mixup some types like xml based files with each other
     val helpingMeta = new Metadata()
     helpingMeta.set(TikaCoreProperties.RESOURCE_NAME_KEY, fileName)
-    val fis         = new FileInputStream(file)
-    val result      =
+    val fis = new FileInputStream(file)
+    val result =
       tika
         .getDetector
         .detect(TikaInputStream.get(fis), helpingMeta)

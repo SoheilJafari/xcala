@@ -48,7 +48,7 @@ class WithSafeDeleteSpec(cmd: CommandLine) extends Specification {
         val cardService   = new CardService()
         val person: Person = Person(name = "test", age = 10)
         personService.insert(person).awaitResult
-        val card  : Card   = Card(title = "test", personId = BSONObjectID.generate())
+        val card: Card = Card(title = "test", personId = BSONObjectID.generate())
         cardService.insert(card).awaitResult
 
         personService.remove(person.id.get).awaitReady()
@@ -64,7 +64,7 @@ class WithSafeDeleteSpec(cmd: CommandLine) extends Specification {
         personService.insert(person1).awaitResult
         val person2: Person = Person(name = "test2", age = 12)
         personService.insert(person2).awaitResult
-        val card   : Card   = Card(title = "test", personId = person2.id.get)
+        val card: Card = Card(title = "test", personId = person2.id.get)
         cardService.insert(card).awaitResult
 
         personService.remove(BSONDocument("name" -> "test")).awaitResult
@@ -79,7 +79,7 @@ class WithSafeDeleteSpec(cmd: CommandLine) extends Specification {
         val cardService   = new CardService()
         val person: Person = Person(name = "test", age = 10)
         personService.insert(person).awaitResult
-        val card  : Card   = Card(title = "test", personId = person.id.get)
+        val card: Card = Card(title = "test", personId = person.id.get)
         cardService.insert(card).awaitResult
 
         personService.remove(person.id.get).awaitResult must throwA[DeleteConstraintError]
@@ -94,7 +94,7 @@ class WithSafeDeleteSpec(cmd: CommandLine) extends Specification {
         personService.insert(person1).awaitResult
         val person2: Person = Person(name = "test2", age = 12)
         personService.insert(person2).awaitResult
-        val card   : Card   = Card(title = "test", personId = person1.id.get)
+        val card: Card = Card(title = "test", personId = person1.id.get)
         cardService.insert(card).awaitResult
 
         personService.remove(BSONDocument("name" -> "test")).awaitResult must throwA[DeleteConstraintError]

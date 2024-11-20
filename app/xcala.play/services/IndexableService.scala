@@ -28,7 +28,7 @@ trait IndexableService[Doc <: DocumentWithId with Indexable]
     collectionFuture.map(
       _.indexesManager.ensure(
         Index(
-          key    = Seq(
+          key = Seq(
             "itemType" -> IndexType.Ascending,
             "lang"     -> IndexType.Ascending,
             "title"    -> IndexType.Ascending,

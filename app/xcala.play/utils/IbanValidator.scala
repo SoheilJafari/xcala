@@ -10,7 +10,7 @@ object IbanValidator {
     iban match {
       case IbanPattern(country, check, account) if country == "IR" && iban.length == 26 =>
         isValid(country = country, check = check, account = account)
-      case _                                                                            =>
+      case _ =>
         false
     }
   }

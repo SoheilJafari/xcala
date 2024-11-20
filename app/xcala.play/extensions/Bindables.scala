@@ -102,7 +102,7 @@ object Bindables {
         id match {
           case Some(Right(id)) if id != "" =>
             Some(BSONObjectID.parse(id).toOption.toRight("Invalid BSON object ID"))
-          case _                           => None
+          case _ => None
         }
       }
 

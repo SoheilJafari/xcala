@@ -96,20 +96,20 @@ trait CrossWithFileUploader[Id] extends WithExecutionContext {
   }
 
   def bindWithFilesWithCallbacks[A, B](
-      form              : Form[A],
-      maybeOldModel     : Option[A],
-      maxLength         : Option[Long]       = None,
-      maybeRatio        : Option[Double]     = None,
-      maybeResolution   : Option[(Int, Int)] = None
+      form           : Form[A],
+      maybeOldModel  : Option[A],
+      maxLength      : Option[Long]       = None,
+      maybeRatio     : Option[Double]     = None,
+      maybeResolution: Option[(Int, Int)] = None
   )(
       validationFunction: (Form[A], Form[A] => Form[A]) => Future[Either[B, B]]
   )(implicit
-      messages          : Messages,
-      request           : Request[MultipartFormData[TemporaryFile]]
+      messages: Messages,
+      request : Request[MultipartFormData[TemporaryFile]]
   ): Future[B] = {
     val handlePreResizes: Boolean =
       form.value match {
-        case None        => false
+        case None => false
         case Some(value) =>
           value match {
             case _: PreResizedImageHolder[_] =>
@@ -145,7 +145,7 @@ trait CrossWithFileUploader[Id] extends WithExecutionContext {
                         ),
                       prevKeyValues
                     )
-                  case Right(keyValues)   =>
+                  case Right(keyValues) =>
                     (prevFormErrors, prevKeyValues ++ keyValues)
                 }
             }
@@ -171,9 +171,9 @@ trait CrossWithFileUploader[Id] extends WithExecutionContext {
                 prevAdditionalKeyValuePairs: Seq[KeyValuesPair]
               ),
               (
-                file                       : MultipartFormData.FilePart[TemporaryFile],
-                formErrors                 : Seq[FormError],
-                keyValues                  : Seq[KeyValuesPair]
+                file      : MultipartFormData.FilePart[TemporaryFile],
+                formErrors: Seq[FormError],
+                keyValues : Seq[KeyValuesPair]
               )
             ) =>
           val nextValidFiles: Seq[MultipartFormData.FilePart[TemporaryFile]] =
@@ -201,7 +201,7 @@ trait CrossWithFileUploader[Id] extends WithExecutionContext {
           maybeOldModel    = maybeOldModel,
           handlePreResizes = handlePreResizes
         ).flatMap {
-          case Left(error)  =>
+          case Left(error) =>
             Future.failed(new Throwable(error))
           case Right(value) =>
             Future.successful {
@@ -214,7 +214,7 @@ trait CrossWithFileUploader[Id] extends WithExecutionContext {
                         case x => x.toString
                       }
                     )
-                case None         =>
+                case None =>
                   "" -> Seq("")
               }
             }
@@ -235,7 +235,7 @@ trait CrossWithFileUploader[Id] extends WithExecutionContext {
             Seq(key -> values.head)
           }
       }
-      val newData            = form.data ++ flattenedKeyValues
+      val newData = form.data ++ flattenedKeyValues
 
       {
         formErrors match {
@@ -269,7 +269,7 @@ trait CrossWithFileUploader[Id] extends WithExecutionContext {
                   } yield value
 
               }
-            case Failure(e)      =>
+            case Failure(e) =>
               {
                 for {
                   _ <-
@@ -314,7 +314,7 @@ trait CrossWithFileUploader[Id] extends WithExecutionContext {
       maybeNewModel: Option[A]
   ): Future[Unit] =
     maybeNewModel match {
-      case None        =>
+      case None =>
         Future.successful(())
       case Some(value) =>
         value match {

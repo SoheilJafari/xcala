@@ -39,7 +39,7 @@ trait DataReadWithCriteriaController[Id, Entity <: EntityWithId[Id], Model, Crit
   ): Future[Paginated[Model]] = {
     val filledCriteriaForm = LanguageSafeFormBinding.bindForm(criteriaForm)
     filledCriteriaForm.value match {
-      case None           =>
+      case None =>
         Future.successful(
           Paginated(
             dataWithTotalCount    = DataWithTotalCount[Model](Nil, 0),

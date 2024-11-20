@@ -50,8 +50,8 @@ class FolderService @Inject() (
 
   def getFilesUnderFolderRecursive(folderId: BSONObjectID): Future[Seq[FileInfo]] = {
     for {
-      files             <- fileInfoService.getFilesUnderFolder(Some(folderId))
-      folders           <- getFoldersUnderFolder(Some(folderId))
+      files   <- fileInfoService.getFilesUnderFolder(Some(folderId))
+      folders <- getFoldersUnderFolder(Some(folderId))
       filesUnderFolders <-
         Future.sequence(folders.map(f => getFilesUnderFolderRecursive(f.id.get))).map(_.flatten)
     } yield {
@@ -61,8 +61,8 @@ class FolderService @Inject() (
 
   def getFoldersUnderFolderRecursive(folderId: BSONObjectID): Future[Seq[Folder]] = {
     for {
-      folder            <- findById(folderId)
-      folders           <- getFoldersUnderFolder(Some(folderId))
+      folder  <- findById(folderId)
+      folders <- getFoldersUnderFolder(Some(folderId))
       filesUnderFolders <-
         Future.sequence(folders.map(f => getFoldersUnderFolderRecursive(f.id.get))).map(_.flatten)
     } yield {
@@ -73,11 +73,11 @@ class FolderService @Inject() (
   def getFolderAndParents(folderId: Option[BSONObjectID]): Future[List[Folder]] = {
     def getFoldersAndParents(folderId: Option[BSONObjectID], folders: List[Folder]): Future[List[Folder]] = {
       folderId match {
-        case None           => Future.successful(folders)
+        case None => Future.successful(folders)
         case Some(folderId) =>
           val folderFuture = findById(folderId)
           folderFuture.flatMap {
-            case None         => Future.successful(folders)
+            case None => Future.successful(folders)
             case Some(folder) =>
               val newFolders = folder :: folders
 

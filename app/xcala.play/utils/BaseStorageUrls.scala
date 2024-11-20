@@ -52,7 +52,7 @@ object BaseStorageUrls {
     ): Call = {
       val minutesToBeExpiredAfter =
         configuration.get[Int]("fileStorage.s3.timeLimitedUrl.urlToBeExpiredAfterMinutes")
-      val expireTime              = DateTime.now().plusMinutes(minutesToBeExpiredAfter)
+      val expireTime = DateTime.now().plusMinutes(minutesToBeExpiredAfter)
       val signature: String = ProtectedImageSignatureParameters(id, expireTime).signature
       protectedImageUrl(
         id         = id,
@@ -74,7 +74,7 @@ object BaseStorageUrls {
     ): Call = {
       val minutesToBeExpiredAfter =
         configuration.get[Int]("fileStorage.s3.timeLimitedUrl.urlToBeExpiredAfterMinutes")
-      val expireTime              = DateTime.now().plusMinutes(minutesToBeExpiredAfter)
+      val expireTime = DateTime.now().plusMinutes(minutesToBeExpiredAfter)
       val signature: String = ProtectedFileSignatureParameters(id, expireTime).signature
       protectedFileUrl(id = id, signature = signature, expireTime = expireTime.getMillis)
     }

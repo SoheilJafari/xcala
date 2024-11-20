@@ -40,11 +40,11 @@ trait ImageRendererController extends WithExecutionContext {
                 } else {
                   image.cover(width, height)
                 }
-              case (Some(width), None)         =>
+              case (Some(width), None) =>
                 image.scaleToWidth(width)
-              case (None, Some(height))        =>
+              case (None, Some(height)) =>
                 image.scaleToHeight(height)
-              case _                           =>
+              case _ =>
                 throw new IllegalArgumentException()
             }
 
