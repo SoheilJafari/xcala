@@ -12,9 +12,9 @@ import scala.concurrent.ExecutionContext
 
 @Singleton
 class ImageTranscodingProviderService @Inject() (
-    actorSystem         : ActorSystem,
-    configuration       : Configuration,
-    fileStorageService  : FileStorageService
+    actorSystem       : ActorSystem,
+    configuration     : Configuration,
+    fileStorageService: FileStorageService
 )(
     implicit
     val ec              : ExecutionContext,

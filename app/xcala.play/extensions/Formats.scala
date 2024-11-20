@@ -44,7 +44,7 @@ object Formats {
           case Failure(_) =>
             JsError(Seq(JsPath() -> Seq(JsonValidationError("error.expected.objectId.format"))))
         }
-      case _           => JsError(Seq(JsPath() -> Seq(JsonValidationError("error.expected.objectId"))))
+      case _ => JsError(Seq(JsPath() -> Seq(JsonValidationError("error.expected.objectId"))))
     }
 
     def writes(o: BSONObjectID): JsValue = JsString(o.stringify)

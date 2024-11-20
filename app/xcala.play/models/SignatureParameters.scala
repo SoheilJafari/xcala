@@ -22,9 +22,9 @@ sealed abstract class SignatureParameters(implicit val configuration: Configurat
 }
 
 sealed abstract class ImageSignatureParameters(
-    id                    : BSONObjectID,
-    isProtected           : Boolean,
-    expiryTime            : Option[DateTime]
+    id         : BSONObjectID,
+    isProtected: Boolean,
+    expiryTime : Option[DateTime]
 )(
     implicit configuration: Configuration
 ) extends SignatureParameters {
@@ -38,9 +38,9 @@ sealed abstract class ImageSignatureParameters(
 }
 
 sealed abstract class FileSignatureParameters(
-    id                    : BSONObjectID,
-    isProtected           : Boolean,
-    expiryTime            : Option[DateTime]
+    id         : BSONObjectID,
+    isProtected: Boolean,
+    expiryTime : Option[DateTime]
 )(
     implicit configuration: Configuration
 ) extends SignatureParameters {

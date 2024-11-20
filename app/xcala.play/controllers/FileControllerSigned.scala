@@ -23,9 +23,9 @@ trait FileControllerSigned extends FileControllerBase {
       signature            : String,
       expireTime           : Option[DateTime]
   )(
-      unverifiedId         : BSONObjectID
+      unverifiedId: BSONObjectID
   )(
-      protectedContent     : BSONObjectID => Action[AnyContent]
+      protectedContent: BSONObjectID => Action[AnyContent]
   ): Action[AnyContent] = {
     val imageSignatureParameters: ImageSignatureParameters =
       if (expectedToBeProtected) {
@@ -48,9 +48,9 @@ trait FileControllerSigned extends FileControllerBase {
       signature            : String,
       expireTime           : Option[DateTime]
   )(
-      unverifiedId         : BSONObjectID
+      unverifiedId: BSONObjectID
   )(
-      protectedContent     : BSONObjectID => Action[AnyContent]
+      protectedContent: BSONObjectID => Action[AnyContent]
   ): Action[AnyContent] = {
     val fileSignatureParameters: FileSignatureParameters =
       if (expectedToBeProtected) {
@@ -87,11 +87,11 @@ trait FileControllerSigned extends FileControllerBase {
     ) { verifiedId =>
       (if (protectedAccess) protectedAction else Action).async {
         fileInfoService.findObjectById(verifiedId).transformWith {
-          case Success(file) if !file.isImage                                   =>
+          case Success(file) if !file.isImage =>
             Future.successful(renderFile(file, CONTENT_DISPOSITION_INLINE))
           case Success(file) if file.isImage && width.isEmpty && height.isEmpty =>
             Future.successful(renderFile(file, CONTENT_DISPOSITION_INLINE))
-          case Success(file) if file.isImage                                    =>
+          case Success(file) if file.isImage =>
             var closedInputStream = false
 
             cache
@@ -100,7 +100,7 @@ trait FileControllerSigned extends FileControllerBase {
                   Using(file.content) { stream =>
                     val image: ImmutableImage = ImmutableImage.loader().fromStream(stream)
 
-                    val safeWidth  =
+                    val safeWidth =
                       Seq(configuration.getOptional[Int]("file.image.maxResize.width"), width).flatten
                         .reduceOption(_ min _)
                     val safeHeight =
@@ -133,7 +133,7 @@ trait FileControllerSigned extends FileControllerBase {
                     file.content.close()
                   }
                   Future.successful(result)
-                case Failure(e)      =>
+                case Failure(e) =>
                   if (!closedInputStream) {
                     file.content.close()
                   }
@@ -142,7 +142,7 @@ trait FileControllerSigned extends FileControllerBase {
                   Sentry.captureException(e, hint)
                   Future.successful(InternalServerError)
               }
-          case Failure(e)                                                       =>
+          case Failure(e) =>
             e match {
               case _: SocketTimeoutException =>
                 Future.successful(InternalServerError)

@@ -82,7 +82,7 @@ object gridWithPager {
       updateTarget   : String       = "",
       maybeCreateCall: Option[Call] = None
   )(
-      columns        : Col[A]*
+      columns: Col[A]*
   )(implicit messages: Messages): HtmlFormat.Appendable = {
     Html(
       grid
@@ -105,7 +105,7 @@ object gridWithoutPager {
       data           : Seq[A],
       maybeCreateCall: Option[Call] = None
   )(
-      columns        : Col[A]*
+      columns: Col[A]*
   )(implicit messages: Messages): HtmlFormat.Appendable = {
     Html(
       grid
@@ -130,12 +130,12 @@ object gridHeader {
       paginated     : Paginated[_],
       updateTarget  : String = ""
   )(implicit
-      messages      : Messages
+      messages: Messages
   ): Html = {
     val colLabel = messages(name)
 
     sortExpression match {
-      case ""   => Html(s"$colLabel")
+      case "" => Html(s"$colLabel")
       case sort =>
         val url =
           paginated.sort(

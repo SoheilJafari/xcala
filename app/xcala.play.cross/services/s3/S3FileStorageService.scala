@@ -74,9 +74,9 @@ class S3FileStorageService @Inject() (
       s3Source.toMat(StreamConverters.asInputStream())(Keep.both).run()
 
     for {
-      metadata <- metadataFuture
-      contentType   = metadata.contentType
-      originalName  =
+      metadata   <- metadataFuture
+      contentType = metadata.contentType
+      originalName =
         metadata.metadata.find(_.name() == "X-Amz-Meta-Name").map(_.value()).getOrElse(objectName)
       contentLength = metadata.contentLength
 
@@ -92,7 +92,7 @@ class S3FileStorageService @Inject() (
   }.transformWith {
     case Success(value) =>
       Future.successful(value)
-    case Failure(e)     =>
+    case Failure(e) =>
       val hint = new Hint
       hint.set("objectName", objectName)
       Sentry.captureException(e, hint)

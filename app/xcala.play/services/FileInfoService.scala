@@ -91,7 +91,7 @@ class FileInfoService @Inject() (
         originalName = fileInfo.name
       )
       .flatMap {
-        case true  =>
+        case true =>
           insert(fileInfo.copy(id = Some(id))).map(Right.apply)
         case false =>
           Future(Left("Storage problem"))
@@ -100,7 +100,7 @@ class FileInfoService @Inject() (
 
   def findObjectById(id: BSONObjectID): Future[FileObject] = {
     fileStorageService.findByObjectName(id.stringify).transform {
-      case Success(value)     =>
+      case Success(value) =>
         toFileObject(value)
       case Failure(exception) =>
         Failure(exception)

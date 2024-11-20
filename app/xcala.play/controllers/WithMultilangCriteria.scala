@@ -24,8 +24,8 @@ trait WithMultilangCriteria[Doc <: DocumentWithId with WithLang, Model, Criteria
       queryOptions: QueryOptions
   )(implicit request: RequestType[_]): Future[Paginated[Model]] = {
     val requestCriteriaData = LanguageSafeFormBinding.bindForm(criteriaForm).data
-    val modifiedData = requestCriteriaData.filter(_._1 != "lang") + ("lang" -> request2Messages.lang.code)
-    val criteriaOpt  = criteriaForm.bind(modifiedData).value
+    val modifiedData        = requestCriteriaData.filter(_._1 != "lang") + ("lang" -> request2Messages.lang.code)
+    val criteriaOpt         = criteriaForm.bind(modifiedData).value
 
     readService.find(criteriaOpt, queryOptions).map { dataWithTotalCount =>
       Paginated(

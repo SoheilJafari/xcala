@@ -45,12 +45,12 @@ class TaskService @Inject() (
       ownerId   : BSONObjectID
   ): Future[_] =
     update(
-      selector      = BSONDocument(
+      selector = BSONDocument(
         "_id"       -> taskId,
         "ownerType" -> ownerType,
         "ownerId"   -> ownerId
       ),
-      update        =
+      update =
         BSONDocument(
           "$set" ->
             BSONDocument(

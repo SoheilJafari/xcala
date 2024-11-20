@@ -100,7 +100,7 @@ class MinioFileStorageService @Inject() (
   }.transformWith {
     case Success(value) =>
       Future.successful(value)
-    case Failure(e)     =>
+    case Failure(e) =>
       val hint = new Hint
       hint.set("objectName", objectName)
       Sentry.captureException(e, hint)
@@ -136,7 +136,7 @@ class MinioFileStorageService @Inject() (
   def getList(path: Option[String] = None): Future[List[String]] =
     Future {
       val cleanPath = getCleanPath(path)
-      val res       = getClient
+      val res = getClient
         .listObjects(
           ListObjectsArgs
             .builder()
@@ -188,7 +188,7 @@ class MinioFileStorageService @Inject() (
   def createDefaultBucket(): Future[Boolean] = {
     for {
       found <- getClient.bucketExists(BucketExistsArgs.builder().bucket(defaultBucketName).build()).asScala
-      _     <- {
+      _ <- {
         if (!found) {
           getClient.makeBucket(MakeBucketArgs.builder.bucket(defaultBucketName).build).asScala
         } else {

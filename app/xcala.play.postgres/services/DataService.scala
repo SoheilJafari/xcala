@@ -32,15 +32,15 @@ trait DataQueryService[Id, Entity <: EntityWithId[Id]] extends DataService {
   val tableQuery: TableQuery[TableDef] = tableDefinition.tableQuery
 
   protected def filterQueryById(id: Id): Query[TableDef, Entity, Seq]
-  protected def mappedToIdColumnQuery: Query[Rep[Id], Id, Seq]
+  protected def mappedToIdColumnQuery  : Query[Rep[Id], Id, Seq]
 
   def distinct[F, G, T](
       f             : tableDefinition.TableDef => Rep[Option[F]],
       maybeCondition: Option[tableDefinition.TableDef => Rep[Boolean]] = None
   )(
       implicit
-      shape         : Shape[_ <: FlatShapeLevel, Rep[Option[F]], Option[T], G],
-      ec            : ExecutionContext
+      shape: Shape[_ <: FlatShapeLevel, Rep[Option[F]], Option[T], G],
+      ec   : ExecutionContext
   ): Future[Set[T]] =
     db.run(
       tableQuery
@@ -87,7 +87,7 @@ sealed trait DataReadService[Id, Entity <: EntityWithId[Id]] extends DataService
   */
 trait DataReadSimpleService[Id, Entity <: EntityWithId[Id], Model] extends DataReadService[Id, Entity] {
   def findById(id: Id): Future[Option[Model]]
-  def findAll: Future[Seq[Model]]
+  def findAll         : Future[Seq[Model]]
 }
 
 /** Implementation of the read service.
@@ -202,7 +202,7 @@ trait DataSaveServiceImpl[Id, Entity <: EntityWithId[Id]]
 
   def update(entity: Entity): Future[Int] = {
     entity.id match {
-      case None     => Future.successful(0)
+      case None => Future.successful(0)
       case Some(id) =>
         val action = filterQueryById(id).update(entity)
         db.run(action)

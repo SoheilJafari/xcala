@@ -70,7 +70,7 @@ object DataReadServiceDecorator {
   val optional: Option[_] => IterableOnce[_] =
     (x: Option[_]) =>
       x match {
-        case None        => None
+        case None => None
         case Some(value) =>
           value match {
             case seq: Seq[_] => seq.headOption
@@ -81,7 +81,7 @@ object DataReadServiceDecorator {
   val sequence: Option[_] => IterableOnce[_] =
     (x: Option[_]) =>
       x match {
-        case None        => Seq.empty
+        case None => Seq.empty
         case Some(value) =>
           value match {
             case seq: Seq[_] => seq
@@ -116,7 +116,7 @@ object DataReadServiceDecorator {
         innerModelIterableMapper: Option[_] => IterableOnce[_]
     )(implicit ec: ExecutionContext): RelationMapper[Doc, InnerModel, K] =
       new RelationMapper(
-        docToKeySet                  = docToKeySet,
+        docToKeySet = docToKeySet,
         allKeysToKeySetToInnerModels = { ids: Set[BSONObjectID] =>
           findAllInnerModelsInKeys(ids).map { models: Seq[InnerModel] =>
             models.groupBy(innerModel => innerModelToKeySet(innerModel))
@@ -125,14 +125,14 @@ object DataReadServiceDecorator {
       )(innerModelIterableMapper)
 
     def apply[Doc, InnerModel, K[_] <: IterableOnce[_]](
-        docToKeySet             : Doc => Set[BSONObjectID],
-        innerModelService       : DataReadSimpleService[_, InnerModel],
-        innerModelToKeySet      : InnerModel => Set[BSONObjectID]
+        docToKeySet       : Doc => Set[BSONObjectID],
+        innerModelService : DataReadSimpleService[_, InnerModel],
+        innerModelToKeySet: InnerModel => Set[BSONObjectID]
     )(
         innerModelIterableMapper: Option[_] => IterableOnce[_]
     )(implicit ec: ExecutionContext): RelationMapper[Doc, InnerModel, K] =
       new RelationMapper(
-        docToKeySet                  = docToKeySet,
+        docToKeySet = docToKeySet,
         allKeysToKeySetToInnerModels = { ids: Set[BSONObjectID] =>
           innerModelService.findInIds(ids).map { models: Seq[InnerModel] =>
             models.groupBy(innerModel => innerModelToKeySet(innerModel))
@@ -149,7 +149,7 @@ object DataReadServiceDecorator {
   ](docs: Seq[Doc])(
       relationMappers: List[RelationMapper[Doc, _, K]]
   )(
-      finalMapper    : Doc => List[IterableOnce[_]] => Future[Model]
+      finalMapper: Doc => List[IterableOnce[_]] => Future[Model]
   )(implicit ec: ExecutionContext): Future[List[Model]] =
     Future
       .traverse(relationMappers) { relationMapper =>
@@ -178,7 +178,7 @@ object DataReadServiceDecorator {
   ](docs: Seq[Doc])(
       relationMapper1: RelationMapper[Doc, IM1, K1]
   )(
-      finalMapper    : Doc => K1[IM1] => Future[Model]
+      finalMapper: Doc => K1[IM1] => Future[Model]
   )(implicit ec: ExecutionContext): Future[List[Model]] =
     mapSeqMakerCore(docs)(
       List(relationMapper1)
@@ -186,7 +186,7 @@ object DataReadServiceDecorator {
       {
         case innerModel1 :: Nil =>
           finalMapper(doc)(innerModel1.asInstanceOf[K1[IM1]])
-        case _                  =>
+        case _ =>
           ???
       }
     }
@@ -202,7 +202,7 @@ object DataReadServiceDecorator {
       relationMapper1: RelationMapper[Doc, IM1, K1],
       relationMapper2: RelationMapper[Doc, IM2, K2]
   )(
-      finalMapper    : Doc => (K1[IM1], K2[IM2]) => Future[Model]
+      finalMapper: Doc => (K1[IM1], K2[IM2]) => Future[Model]
   )(implicit ec: ExecutionContext): Future[List[Model]] =
     mapSeqMakerCore(docs)(
       List(relationMapper1, relationMapper2)
@@ -213,7 +213,7 @@ object DataReadServiceDecorator {
             innerModel1.asInstanceOf[K1[IM1]],
             innerModel2.asInstanceOf[K2[IM2]]
           )
-        case _                                 =>
+        case _ =>
           ???
       }
     }
@@ -232,7 +232,7 @@ object DataReadServiceDecorator {
       relationMapper2: RelationMapper[Doc, IM2, K2],
       relationMapper3: RelationMapper[Doc, IM3, K3]
   )(
-      finalMapper    : Doc => (K1[IM1], K2[IM2], K3[IM3]) => Future[Model]
+      finalMapper: Doc => (K1[IM1], K2[IM2], K3[IM3]) => Future[Model]
   )(implicit ec: ExecutionContext): Future[List[Model]] =
     mapSeqMakerCore(docs)(
       List(relationMapper1, relationMapper2, relationMapper3)
@@ -244,7 +244,7 @@ object DataReadServiceDecorator {
             innerModel2.asInstanceOf[K2[IM2]],
             innerModel3.asInstanceOf[K3[IM3]]
           )
-        case _                                                =>
+        case _ =>
           ???
       }
     }
@@ -266,7 +266,7 @@ object DataReadServiceDecorator {
       relationMapper3: RelationMapper[Doc, IM3, K3],
       relationMapper4: RelationMapper[Doc, IM4, K4]
   )(
-      finalMapper    : Doc => (K1[IM1], K2[IM2], K3[IM3], K4[IM4]) => Future[Model]
+      finalMapper: Doc => (K1[IM1], K2[IM2], K3[IM3], K4[IM4]) => Future[Model]
   )(implicit ec: ExecutionContext): Future[List[Model]] = {
 
     mapSeqMakerCore(docs)(
@@ -280,7 +280,7 @@ object DataReadServiceDecorator {
             innerModel3.asInstanceOf[K3[IM3]],
             innerModel4.asInstanceOf[K4[IM4]]
           )
-        case _                                                               =>
+        case _ =>
           ???
       }
     }
@@ -307,7 +307,7 @@ object DataReadServiceDecorator {
       relationMapper4: RelationMapper[Doc, IM4, K4],
       relationMapper5: RelationMapper[Doc, IM5, K5]
   )(
-      finalMapper    : Doc => (K1[IM1], K2[IM2], K3[IM3], K4[IM4], K5[IM5]) => Future[Model]
+      finalMapper: Doc => (K1[IM1], K2[IM2], K3[IM3], K4[IM4], K5[IM5]) => Future[Model]
   )(implicit ec: ExecutionContext): Future[List[Model]] = {
 
     mapSeqMakerCore(docs)(
@@ -322,7 +322,7 @@ object DataReadServiceDecorator {
             innerModel4.asInstanceOf[K4[IM4]],
             innerModel5.asInstanceOf[K5[IM5]]
           )
-        case _                                                                              =>
+        case _ =>
           ???
       }
     }
@@ -352,7 +352,7 @@ object DataReadServiceDecorator {
       relationMapper5: RelationMapper[Doc, IM5, K5],
       relationMapper6: RelationMapper[Doc, IM6, K6]
   )(
-      finalMapper    : Doc => (K1[IM1], K2[IM2], K3[IM3], K4[IM4], K5[IM5], K6[IM6]) => Future[Model]
+      finalMapper: Doc => (K1[IM1], K2[IM2], K3[IM3], K4[IM4], K5[IM5], K6[IM6]) => Future[Model]
   )(implicit ec: ExecutionContext): Future[List[Model]] = {
 
     mapSeqMakerCore(docs)(
@@ -375,7 +375,7 @@ object DataReadServiceDecorator {
             innerModel5.asInstanceOf[K5[IM5]],
             innerModel6.asInstanceOf[K6[IM6]]
           )
-        case _                                                                                             =>
+        case _ =>
           ???
       }
     }
@@ -408,7 +408,7 @@ object DataReadServiceDecorator {
       relationMapper6: RelationMapper[Doc, IM6, K6],
       relationMapper7: RelationMapper[Doc, IM7, K7]
   )(
-      finalMapper    : Doc => (K1[IM1], K2[IM2], K3[IM3], K4[IM4], K5[IM5], K6[IM6], K7[IM7]) => Future[Model]
+      finalMapper: Doc => (K1[IM1], K2[IM2], K3[IM3], K4[IM4], K5[IM5], K6[IM6], K7[IM7]) => Future[Model]
   )(implicit ec: ExecutionContext): Future[List[Model]] = {
 
     mapSeqMakerCore(docs)(

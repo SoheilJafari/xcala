@@ -18,8 +18,8 @@ trait DataCrudDecoratorService[Id, Entity <: EntityWithId[Id], Model <: { val id
     with DataSaveService[Id, Entity, Entity]
     with DataRemoveService[Id, Entity]
 
-  def mapModel(source     : Entity): Future[Model]
-  def mapBackModel(source : Model): Future[Entity]
+  def mapModel(source     : Entity)                    : Future[Model]
+  def mapBackModel(source : Model)                     : Future[Entity]
   def copyBackModel(source: Model, destination: Entity): Future[Entity]
 
   def findById(id: Id): Future[Option[Model]] = {
