@@ -17,6 +17,8 @@ import akka.stream.scaladsl.StreamConverters
 import akka.util.ByteString
 
 import java.io.InputStream
+import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
@@ -41,9 +43,13 @@ class S3FileStorageService @Inject() (
 
     val sink: Sink[ByteString, Future[MultipartUploadResult]] = S3
       .multipartUpload(
-        bucket      = bucketName,
-        key         = cleanPath.concat(objectName),
-        metaHeaders = MetaHeaders(Map(elems = "name" -> originalName)),
+        bucket = bucketName,
+        key    = cleanPath.concat(objectName),
+        metaHeaders = MetaHeaders(
+          Map(
+            "name" -> java.net.URLEncoder.encode(originalName, StandardCharsets.UTF_8.name())
+          )
+        ),
         contentType =
           ContentType.parse(contentType).toOption.getOrElse(ContentTypes.`application/octet-stream`)
       )
@@ -82,7 +88,7 @@ class S3FileStorageService @Inject() (
 
     } yield FileS3Object(
       objectName    = objectName,
-      originalName  = originalName,
+      originalName  = URLDecoder.decode(originalName, StandardCharsets.UTF_8.name()),
       content       = inputStream,
       contentLength = Some(contentLength).filter(_ != 0),
       contentType   = contentType,
