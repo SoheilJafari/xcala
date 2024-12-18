@@ -1,5 +1,13 @@
 package xcala.play.cross.services.s3
 
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
+import software.amazon.awssdk.regions.Region
+import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.S3Configuration
+import software.amazon.awssdk.services.s3.model.{CopyObjectRequest, CopyObjectResponse}
+import software.amazon.awssdk.services.s3.model.HeadObjectRequest
+import software.amazon.awssdk.services.s3.model.HeadObjectResponse
 import xcala.play.cross.services.s3.FileStorageService.FileS3Object
 
 import akka.NotUsed
@@ -16,7 +24,9 @@ import akka.stream.scaladsl.Source
 import akka.stream.scaladsl.StreamConverters
 import akka.util.ByteString
 
+import java.{util => ju}
 import java.io.InputStream
+import java.net.URI
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
 import javax.inject.Inject
@@ -31,6 +41,13 @@ import io.sentry.Sentry
 class S3FileStorageService @Inject() (
     val config: play.api.Configuration
 )(implicit val ec: ExecutionContext, materializer: Materializer) extends FileStorageService {
+  lazy val accessKeyId     = config.get[String]("alpakka.s3.aws.credentials.access-key-id")
+  lazy val secretAccessKey = config.get[String]("alpakka.s3.aws.credentials.secret-access-key")
+  lazy val endpointUrl     = config.get[String]("alpakka.s3.endpoint-url")
+
+  private val credentialsProvider = StaticCredentialsProvider.create(
+    AwsBasicCredentials.create(accessKeyId, secretAccessKey)
+  )
 
   override def upload(
       objectName  : String,
@@ -127,6 +144,56 @@ class S3FileStorageService @Inject() (
         prefix = None
       )
       .map(_.key)
+
+  def updateObjectMetadata(objectName: String)(
+      conditionFunction   : ju.Map[String, String] => Boolean,
+      userMetadataFunction: ju.Map[String, String] => ju.Map[String, String],
+      contentTypeFunction : String => String
+  ): Future[Option[CopyObjectResponse]] =
+    Future {
+      val s3Client: S3Client =
+        S3Client.builder()
+          .region(Region.EU_CENTRAL_1)
+          .credentialsProvider(credentialsProvider)
+          .endpointOverride(URI.create(endpointUrl))
+          .serviceConfiguration(
+            S3Configuration.builder().pathStyleAccessEnabled(true).build()
+          )
+          .build()
+
+      val headRequest: HeadObjectRequest =
+        HeadObjectRequest.builder()
+          .bucket(bucketName)
+          .key(objectName)
+          .build()
+
+      val headResponse: HeadObjectResponse =
+        s3Client.headObject(headRequest)
+
+      val metadataMap = new ju.HashMap(headResponse.metadata())
+      if (conditionFunction(metadataMap)) {
+
+        val userMetadata: ju.Map[String, String] = userMetadataFunction(metadataMap)
+        val contentType : String                 = contentTypeFunction(headResponse.contentType())
+
+        Some(s3Client
+          .copyObject(
+            CopyObjectRequest.builder()
+              .sourceBucket(bucketName)
+              .sourceKey(objectName)
+              .destinationBucket(bucketName)
+              .destinationKey(objectName)
+              .metadata(userMetadata)                          // Set user metadata
+              .contentType(contentType)                        // Preserve content type
+              .contentEncoding(headResponse.contentEncoding()) // Preserve content encoding
+              .cacheControl(headResponse.cacheControl())       // Preserve cache control
+              .metadataDirective("REPLACE")
+              .build()
+          ))
+      } else {
+        None
+      }
+    }
 
   override def getList(path: Option[String]): Future[List[String]] =
     filesStream(path)
