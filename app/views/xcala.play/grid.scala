@@ -22,6 +22,7 @@ object grid {
       updateTarget   : String,
       columns        : Seq[Col[A]],
       messages       : Messages,
+      isResponsive   : Boolean      = true,
       maybeCreateCall: Option[Call] = None
   ): HtmlFormat.Appendable = {
     val rows =
@@ -44,13 +45,21 @@ object grid {
     val filteredColumns: Seq[Col[A]] =
       columns.filter(c => columnNamesWithData.contains(c.name))
 
-    views.html.xcala.play.gridView(filteredColumns, rows, paginated, updateTarget, maybeCreateCall)(messages)
+    views.html.xcala.play.gridView(
+      filteredColumns,
+      rows,
+      paginated,
+      updateTarget,
+      maybeCreateCall,
+      isResponsive
+    )(messages)
   }
 
   def renderGridWithoutPagination[A](
       data           : Seq[A],
       columns        : Seq[Col[A]],
       messages       : Messages,
+      isResponsive   : Boolean      = true,
       maybeCreateCall: Option[Call] = None
   ): HtmlFormat.Appendable = {
     val rows =
@@ -70,7 +79,9 @@ object grid {
     val filteredColumns: Seq[Col[A]] =
       columns.filter(c => columnNamesWithData.contains(c.name))
 
-    views.html.xcala.play.gridViewWithoutPagination(filteredColumns, rows, maybeCreateCall)(messages)
+    views.html.xcala.play.gridViewWithoutPagination(filteredColumns, rows, maybeCreateCall, isResponsive)(
+      messages
+    )
   }
 
 }
