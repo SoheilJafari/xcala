@@ -7,6 +7,7 @@ import xcala.play.postgres.utils.QueryHelpers._
 import xcala.play.utils.WithExecutionContext
 
 import play.api.mvc.Request
+import play.api.mvc.RequestHeader
 
 import java.util.UUID
 import scala.concurrent.ExecutionContext
@@ -212,7 +213,11 @@ trait DataSaveServiceImpl[Id, Entity <: EntityWithId[Id]]
 }
 
 trait DataRemoveService[Id, Entity <: EntityWithId[Id]] extends DataService {
-  def delete(id: Id): Future[Int]
+
+  def delete(id: Id)(implicit
+      requestHeader: RequestHeader
+  ): Future[Int]
+
 }
 
 trait DataRemoveServiceImpl[Id, Entity <: EntityWithId[Id]]

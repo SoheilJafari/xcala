@@ -9,6 +9,8 @@ import xcala.play.models.FileInfo
 import xcala.play.services.DataRemoveServiceImpl
 import xcala.play.services.DataSaveServiceImpl
 
+import play.api.mvc.RequestHeader
+
 import java.io.InputStream
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -74,14 +76,18 @@ class FileInfoService @Inject() (
       .map(Some(_))
   }
 
-  def removeFile(id: BSONObjectID): Future[Either[String, Int]] = {
+  def removeFile(id: BSONObjectID)(implicit
+      requestHeader: RequestHeader
+  ): Future[Either[String, Int]] = {
     fileStorageService.deleteByObjectName(id.stringify).flatMap {
       case true => remove(id).map(x => Right(x.n))
       case _    => Future.successful(Left("Storage problem"))
     }
   }
 
-  def upload(fileInfo: FileInfo, content: Array[Byte]): Future[Either[String, BSONObjectID]] = {
+  def upload(fileInfo: FileInfo, content: Array[Byte])(implicit
+      requestHeader: RequestHeader
+  ): Future[Either[String, BSONObjectID]] = {
     val id = BSONObjectID.generate()
     fileStorageService
       .upload(
@@ -98,7 +104,9 @@ class FileInfoService @Inject() (
       }
   }
 
-  def findObjectById(id: BSONObjectID): Future[FileObject] = {
+  def findObjectById(id: BSONObjectID)(implicit
+      requestHeader: RequestHeader
+  ): Future[FileObject] = {
     fileStorageService.findByObjectName(id.stringify).transform {
       case Success(value) =>
         toFileObject(value)

@@ -13,6 +13,8 @@ import xcala.play.postgres.services.DbConfig
 import xcala.play.postgres.services.FileInfoService.FileObject
 import xcala.play.postgres.utils.QueryHelpers._
 
+import play.api.mvc.RequestHeader
+
 import java.io.InputStream
 import java.util.UUID
 import javax.inject._
@@ -72,7 +74,9 @@ class FileInfoService @Inject() (
     db.run(tableQuery.filter(_.id === id).map(_.name).update(newName))
   }
 
-  def removeFile(id: UUID): Future[Either[String, Int]] = {
+  def removeFile(id: UUID)(implicit
+      requestHeader: RequestHeader
+  ): Future[Either[String, Int]] = {
     fileStorageService.deleteByObjectName(id.toString).flatMap {
       case true =>
         val action = filterQueryById(id).delete
@@ -81,13 +85,17 @@ class FileInfoService @Inject() (
     }
   }
 
-  override def delete(id: UUID): Future[Int] =
+  override def delete(id: UUID)(implicit
+      requestHeader: RequestHeader
+  ): Future[Int] =
     removeFile(id).map {
       case Right(value) => value
       case Left(_)      => 0
     }
 
-  def upload(fileEntity: FileInfo, content: Array[Byte]): Future[Either[String, UUID]] = {
+  def upload(fileEntity: FileInfo, content: Array[Byte])(implicit
+      requestHeader: RequestHeader
+  ): Future[Either[String, UUID]] = {
     val id: UUID = UUID.randomUUID()
     fileStorageService
       .upload(
@@ -104,7 +112,9 @@ class FileInfoService @Inject() (
       }
   }
 
-  def findObjectById(id: UUID): Future[FileObject] = {
+  def findObjectById(id: UUID)(implicit
+      requestHeader: RequestHeader
+  ): Future[FileObject] = {
     fileStorageService.findByObjectName(id.toString).transform {
       case Success(value) =>
         toFileObject(value)
@@ -113,7 +123,9 @@ class FileInfoService @Inject() (
     }
   }
 
-  def duplicate(id: UUID): Future[Either[String, UUID]] = {
+  def duplicate(id: UUID)(implicit
+      requestHeader: RequestHeader
+  ): Future[Either[String, UUID]] = {
     fileStorageService.findByObjectName(id.toString).transformWith {
       case Success(value) =>
         Future.fromTry(

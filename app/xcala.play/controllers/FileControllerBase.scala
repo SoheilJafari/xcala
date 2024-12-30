@@ -322,7 +322,9 @@ private[controllers] trait FileControllerBase
       dispositionMode = dispositionMode
     )
 
-  protected def renderFile(id: BSONObjectID, dispositionMode: String): Future[Result] = {
+  protected def renderFile(id: BSONObjectID, dispositionMode: String)(implicit
+      requestHeader: RequestHeader
+  ): Future[Result] = {
     fileInfoService.findObjectById(id).transform {
 
       case Success(file) =>

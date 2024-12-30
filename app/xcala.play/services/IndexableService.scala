@@ -5,6 +5,8 @@ import xcala.play.models.DocumentWithId
 import xcala.play.models.Indexable
 import xcala.play.models.IndexedItem
 
+import play.api.mvc.RequestHeader
+
 import scala.concurrent.Future
 import scala.util.Failure
 import scala.util.Success
@@ -42,7 +44,7 @@ trait IndexableService[Doc <: DocumentWithId with Indexable]
     coll
   }
 
-  abstract override def save(model: Doc): Future[BSONObjectID] = {
+  abstract override def save(model: Doc)(implicit requestHeader: RequestHeader): Future[BSONObjectID] = {
     documentHandler.writeTry(model) match {
       case Success(_) =>
         val result = super.save(model)

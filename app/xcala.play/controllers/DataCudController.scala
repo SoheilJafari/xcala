@@ -30,7 +30,8 @@ trait DataCudController[Doc <: DocumentWithId, Model, BodyType]
   def defaultForm: Form[Model]
 
   @annotation.nowarn
-  def modelValidation(model: Model): Future[Either[String, Unit]] = Future.successful(Right(model))
+  def modelValidation(model: Model)(implicit requestHeader: RequestHeader): Future[Either[String, Unit]] =
+    Future.successful(Right(model))
 
   def postBindFormValidation(
       f: Model => Future[Result]

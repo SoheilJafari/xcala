@@ -5,6 +5,8 @@ import xcala.play.models.Folder
 import xcala.play.services.DataRemoveServiceImpl
 import xcala.play.services.DataSaveServiceImpl
 
+import play.api.mvc.RequestHeader
+
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
@@ -36,7 +38,9 @@ class FolderService @Inject() (
     )
   }
 
-  def removeFolder(id: BSONObjectID): Future[Option[WriteResult]] = {
+  def removeFolder(id: BSONObjectID)(implicit
+      requestHeader: RequestHeader
+  ): Future[Option[WriteResult]] = {
     getFilesUnderFolderRecursive(id).flatMap { files =>
       removeFolderUnderFolder(id).map { writeError =>
         if (!writeError.exists(_.writeErrors.nonEmpty)) {

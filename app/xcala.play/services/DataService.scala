@@ -5,6 +5,8 @@ import xcala.play.models._
 import xcala.play.models.DocumentWithId
 import xcala.play.utils.WithExecutionContext
 
+import play.api.mvc.RequestHeader
+
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
@@ -192,8 +194,8 @@ trait DataReadSimpleServiceImpl[Doc <: DocumentWithId]
 /** Represents the create or update functionality of the Crud service.
   */
 trait DataSaveService[Doc <: DocumentWithId, Model] {
-  def insert(model: Model): Future[BSONObjectID]
-  def save(model  : Model): Future[BSONObjectID]
+  def insert(model: Model)                                       : Future[BSONObjectID]
+  def save(model  : Model)(implicit requestHeader: RequestHeader): Future[BSONObjectID]
 }
 
 trait DataSaveServiceImpl[Doc <: DocumentWithId]
@@ -247,7 +249,7 @@ trait DataSaveServiceImpl[Doc <: DocumentWithId]
 
   }
 
-  def save(model: Doc): Future[BSONObjectID] = {
+  def save(model: Doc)(implicit requestHeader: RequestHeader): Future[BSONObjectID] = {
     val (newDoc, objectId) = getDocWithId(model)
     val updateDoc          = setCreateAndUpdateTime(newDoc)
 

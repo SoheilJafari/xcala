@@ -4,6 +4,7 @@ import xcala.play.cross.services.s3.FileStorageService.FileS3Object
 
 import akka.NotUsed
 import akka.stream.scaladsl.Source
+import play.api.mvc.RequestHeader
 
 import java.io.InputStream
 import scala.concurrent.Future
@@ -32,6 +33,8 @@ trait FileStorageService {
       contentType : String,
       originalName: String,
       path        : Option[String] = None
+  )(implicit
+      requestHeader: RequestHeader
   ): Future[Boolean]
 
   /** Read file from s3
@@ -42,7 +45,9 @@ trait FileStorageService {
     *   String, directory of the file. Ex: first/second/thirdFolder/
     * @return
     */
-  def findByObjectName(objectName: String, path: Option[String] = None): Future[FileS3Object]
+  def findByObjectName(objectName: String, path: Option[String] = None)(implicit
+      requestHeader: RequestHeader
+  ): Future[FileS3Object]
 
   /** Delete file by name and path
     *
@@ -52,9 +57,13 @@ trait FileStorageService {
     *   String Ex: folder1/folder2/
     * @return
     */
-  def deleteByObjectName(objectName: String, path: Option[String] = None): Future[Boolean]
+  def deleteByObjectName(objectName: String, path: Option[String] = None)(implicit
+      requestHeader: RequestHeader
+  ): Future[Boolean]
 
-  def getList(path: Option[String] = None): Future[List[String]]
+  def getList(path: Option[String] = None)(implicit
+      requestHeader: RequestHeader
+  ): Future[List[String]]
 
   def filesStream(path: Option[String] = None): Source[String, NotUsed]
 
