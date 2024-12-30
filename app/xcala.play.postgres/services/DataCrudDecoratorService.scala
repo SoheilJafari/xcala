@@ -3,6 +3,8 @@ package xcala.play.postgres.services
 import xcala.play.postgres.models._
 import xcala.play.utils.WithExecutionContext
 
+import play.api.mvc.RequestHeader
+
 import scala.concurrent.Future
 import scala.language.reflectiveCalls
 
@@ -65,5 +67,8 @@ trait DataCrudDecoratorService[Id, Entity <: EntityWithId[Id], Model <: { val id
       .getOrElse(Future.successful(0))
   }
 
-  def delete(id: Id): Future[Int] = service.delete(id)
+  def delete(id: Id)(implicit
+      requestHeader: RequestHeader
+  ): Future[Int] = service.delete(id)
+
 }

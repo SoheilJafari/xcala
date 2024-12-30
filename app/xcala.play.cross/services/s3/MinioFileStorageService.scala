@@ -1,7 +1,10 @@
 package xcala.play.cross.services.s3
 
+import xcala.play.models.SentryExtendedBase
+
 import akka.NotUsed
 import akka.stream.scaladsl.Source
+import play.api.mvc.RequestHeader
 
 import java.io.File
 import java.io.FileOutputStream
@@ -23,13 +26,13 @@ import io.minio.MinioAsyncClient
 import io.minio.RemoveObjectArgs
 import io.minio.UploadObjectArgs
 import io.sentry.Hint
-import io.sentry.Sentry
 import okhttp3.ConnectionPool
 import okhttp3.OkHttpClient
 import okhttp3.Protocol
 
 class MinioFileStorageService @Inject() (
-    val config: play.api.Configuration
+    val config    : play.api.Configuration,
+    sentryExtended: SentryExtendedBase
 )(implicit val ec: ExecutionContext) extends FileStorageService {
   import FileStorageService._
 
@@ -41,6 +44,8 @@ class MinioFileStorageService @Inject() (
       contentType : String,
       originalName: String,
       path        : Option[String] = None
+  )(implicit
+      requestHeader: RequestHeader
   ): Future[Boolean] = {
     val userMetaData = Map("name" -> originalName).asJava
     val cleanPath    = getCleanPath(path)
@@ -66,12 +71,14 @@ class MinioFileStorageService @Inject() (
     case Failure(e) =>
       val hint = new Hint
       hint.set("objectName", objectName)
-      Sentry.captureException(e, hint)
+      sentryExtended.captureExceptionWithHint(e, hint)
       Future.successful(false)
 
   }
 
-  def findByObjectName(objectName: String, path: Option[String] = None): Future[FileS3Object] = {
+  def findByObjectName(objectName: String, path: Option[String] = None)(implicit
+      requestHeader: RequestHeader
+  ): Future[FileS3Object] = {
     val cleanPath = getCleanPath(path)
 
     for {
@@ -103,11 +110,13 @@ class MinioFileStorageService @Inject() (
     case Failure(e) =>
       val hint = new Hint
       hint.set("objectName", objectName)
-      Sentry.captureException(e, hint)
+      sentryExtended.captureExceptionWithHint(e, hint)
       Future.failed(e)
   }
 
-  def deleteByObjectName(objectName: String, path: Option[String] = None): Future[Boolean] = {
+  def deleteByObjectName(objectName: String, path: Option[String] = None)(implicit
+      requestHeader: RequestHeader
+  ): Future[Boolean] = {
     val cleanPath = getCleanPath(path)
     getClient
       .removeObject(
@@ -123,7 +132,7 @@ class MinioFileStorageService @Inject() (
     case Failure(e) =>
       val hint = new Hint
       hint.set("objectName", objectName)
-      Sentry.captureException(e, hint)
+      sentryExtended.captureExceptionWithHint(e, hint)
       Future.successful(false)
   }
 
@@ -133,7 +142,9 @@ class MinioFileStorageService @Inject() (
     *   String, Ex: folder1/folder2/
     * @return
     */
-  def getList(path: Option[String] = None): Future[List[String]] =
+  def getList(path: Option[String] = None)(implicit
+      requestHeader: RequestHeader
+  ): Future[List[String]] =
     Future {
       val cleanPath = getCleanPath(path)
       val res = getClient
@@ -154,7 +165,7 @@ class MinioFileStorageService @Inject() (
         }
         .toList
     }.recoverWith { case e: Throwable =>
-      Sentry.captureException(e)
+      sentryExtended.captureException(e)
       Future.successful(List.empty[String])
     }
 
@@ -185,7 +196,7 @@ class MinioFileStorageService @Inject() (
     *
     * @return
     */
-  def createDefaultBucket(): Future[Boolean] = {
+  def createDefaultBucket()(implicit requestHeader: RequestHeader): Future[Boolean] = {
     for {
       found <- getClient.bucketExists(BucketExistsArgs.builder().bucket(defaultBucketName).build()).asScala
       _ <- {
@@ -198,7 +209,7 @@ class MinioFileStorageService @Inject() (
 
     } yield true
   }.recover { case e: Throwable =>
-    Sentry.captureException(e)
+    sentryExtended.captureException(e)
     false
   }
 

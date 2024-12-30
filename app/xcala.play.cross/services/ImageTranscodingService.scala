@@ -28,6 +28,7 @@ import akka.stream.scaladsl.Source
 import akka.util.Timeout
 import play.api.Configuration
 import play.api.libs.json.Json
+import play.api.mvc.RequestHeader
 
 import java.util.UUID
 import java.util.concurrent.atomic.AtomicReference
@@ -187,6 +188,8 @@ class ImageTranscodingService(
   @SuppressWarnings(Array("SwallowedException"))
   def uploadPreResizesByFileId[Id](
       fileId: Id
+  )(implicit
+      requestHeader: RequestHeader
   ): Future[Either[String, Unit]] = {
     val fileIdString: String =
       fileId match {
@@ -255,8 +258,8 @@ class ImageTranscodingService(
       }
   }
 
-  def uploadPreResizes[Id](
-      preResizedImageHolder: PreResizedImageHolder[Id]
+  def uploadPreResizes[Id](preResizedImageHolder: PreResizedImageHolder[Id])(implicit
+      requestHeader: RequestHeader
   ): Future[Either[String, Unit]] =
     preResizedImageHolder.maybeImageFileId match {
       case Some(fileId) =>
@@ -280,7 +283,8 @@ class ImageTranscodingService(
   )(
       implicit
       fileStorageService: FileStorageService,
-      ec                : ExecutionContext
+      ec                : ExecutionContext,
+      requestHeader     : RequestHeader
   ): Future[_] = {
     preResizedImageHolder.maybeImageFileId match {
       case Some(imageFileId) =>

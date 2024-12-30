@@ -19,7 +19,7 @@ trait FileControllerUnsigned extends FileControllerBase {
       id    : String,
       width : Option[Int],
       height: Option[Int]
-  ): Action[AnyContent] = Action.async {
+  ): Action[AnyContent] = Action.async { implicit request =>
     BSONObjectID.parse(id.split('.').headOption.getOrElse(id)) match {
       case Success(bsonObjectId) =>
         fileInfoService.findObjectById(bsonObjectId).transformWith {
@@ -103,7 +103,7 @@ trait FileControllerUnsigned extends FileControllerBase {
   }
 
   def getFile(id: BSONObjectID): Action[AnyContent] =
-    Action.async {
+    Action.async { implicit request =>
       renderFile(id, CONTENT_DISPOSITION_ATTACHMENT)
     }
 

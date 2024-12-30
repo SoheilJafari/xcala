@@ -15,6 +15,7 @@ import play.api.i18n.Messages
 import play.api.libs.Files.TemporaryFile
 import play.api.mvc.MultipartFormData
 import play.api.mvc.Request
+import play.api.mvc.RequestHeader
 
 import scala.concurrent.Future
 import scala.util.Failure
@@ -287,6 +288,8 @@ trait CrossWithFileUploader[Id] extends WithExecutionContext {
   protected def handleNewPreResizes[A <: PreResizedImageHolder[Id]](
       maybeOldModel: Option[A],
       newFileId    : Id
+  )(implicit
+      requestHeader: RequestHeader
   ): Future[Either[String, Unit]] = {
     implicit val fileStorageService: FileStorageService = fileInfoService.fileStorageService
     if (!maybeOldModel.map(_.maybeImageFileId).contains[Option[Id]](Some(newFileId))) {
@@ -312,6 +315,8 @@ trait CrossWithFileUploader[Id] extends WithExecutionContext {
 
   protected def handleObsoletePreResizes[A](
       maybeNewModel: Option[A]
+  )(implicit
+      requestHeader: RequestHeader
   ): Future[Unit] =
     maybeNewModel match {
       case None =>
@@ -321,7 +326,8 @@ trait CrossWithFileUploader[Id] extends WithExecutionContext {
           case preResizedImageHolder: PreResizedImageHolder[_] =>
             imageTranscodingService.removePreResizes(preResizedImageHolder)(
               fileStorageService = fileInfoService.fileStorageService,
-              ec                 = ec
+              ec                 = ec,
+              requestHeader      = requestHeader
             ).map(_ => ())
           case _ =>
             Future.successful(())
@@ -330,12 +336,14 @@ trait CrossWithFileUploader[Id] extends WithExecutionContext {
 
   protected def handleObsoleteUploadedFiles(
       filesIds: Seq[String]
-  ): Future[Seq[Either[String, Int]]]
+  )(implicit requestHeader: RequestHeader): Future[Seq[Either[String, Int]]]
 
   protected def saveFile[A](
       filePart        : MultipartFormData.FilePart[TemporaryFile],
       maybeOldModel   : Option[A],
       handlePreResizes: Boolean
+  )(implicit
+      requestHeader: RequestHeader
   ): Future[Either[String, Option[Id]]]
 
 }

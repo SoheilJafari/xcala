@@ -3,6 +3,8 @@ package xcala.play.services
 import xcala.play.models.DocumentWithId
 import xcala.play.utils.WithExecutionContext
 
+import play.api.mvc.RequestHeader
+
 import scala.concurrent.Future
 
 import reactivemongo.api.bson._
@@ -24,7 +26,7 @@ trait DataCrudServiceDecorator[Doc <: DocumentWithId, Model]
 
   def insert(model: Model): Future[BSONObjectID] = mapBackModel(model).flatMap(service.insert)
 
-  def save(model: Model): Future[BSONObjectID] = {
+  def save(model: Model)(implicit requestHeader: RequestHeader): Future[BSONObjectID] = {
     getIdFromModel(model) match {
       case Some(id) =>
         service.findById(id).flatMap {

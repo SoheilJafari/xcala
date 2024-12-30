@@ -25,6 +25,8 @@ trait WithFileUploader extends CrossWithFileUploader[UUID] {
 
   protected def handleObsoleteUploadedFiles(
       filesIds: Seq[String]
+  )(implicit
+      requestHeader: RequestHeader
   ): Future[Seq[Either[String, Int]]] =
     Future.traverse(filesIds.map(UUID.fromString))(fileInfoService.removeFile)
 
@@ -32,6 +34,8 @@ trait WithFileUploader extends CrossWithFileUploader[UUID] {
       filePart        : MultipartFormData.FilePart[TemporaryFile],
       maybeOldModel   : Option[A],
       handlePreResizes: Boolean
+  )(implicit
+      requestHeader: RequestHeader
   ): Future[Either[String, Option[UUID]]] = {
     val fileExtension = FilenameUtils.getExtension(filePart.filename)
 

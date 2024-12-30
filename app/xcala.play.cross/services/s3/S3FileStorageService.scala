@@ -9,6 +9,7 @@ import software.amazon.awssdk.services.s3.model.{CopyObjectRequest, CopyObjectRe
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest
 import software.amazon.awssdk.services.s3.model.HeadObjectResponse
 import xcala.play.cross.services.s3.FileStorageService.FileS3Object
+import xcala.play.models.SentryExtendedBase
 
 import akka.NotUsed
 import akka.http.scaladsl.model.ContentType
@@ -23,6 +24,7 @@ import akka.stream.scaladsl.Sink
 import akka.stream.scaladsl.Source
 import akka.stream.scaladsl.StreamConverters
 import akka.util.ByteString
+import play.api.mvc.RequestHeader
 
 import java.{util => ju}
 import java.io.InputStream
@@ -36,10 +38,10 @@ import scala.util.Failure
 import scala.util.Success
 
 import io.sentry.Hint
-import io.sentry.Sentry
 
 class S3FileStorageService @Inject() (
-    val config: play.api.Configuration
+    val config    : play.api.Configuration,
+    sentryExtended: SentryExtendedBase
 )(implicit val ec: ExecutionContext, materializer: Materializer) extends FileStorageService {
   lazy val accessKeyId     = config.get[String]("alpakka.s3.aws.credentials.access-key-id")
   lazy val secretAccessKey = config.get[String]("alpakka.s3.aws.credentials.secret-access-key")
@@ -55,6 +57,8 @@ class S3FileStorageService @Inject() (
       contentType : String,
       originalName: String,
       path        : Option[String]
+  )(implicit
+      requestHeader: RequestHeader
   ): Future[Boolean] = {
     val cleanPath: String = getCleanPath(path)
 
@@ -78,13 +82,15 @@ class S3FileStorageService @Inject() (
         case Failure(e) =>
           val hint = new Hint
           hint.set("objectName", objectName)
-          Sentry.captureException(e, hint)
+          sentryExtended.captureExceptionWithHint(e, hint)
           Future.successful(false)
       }
 
   }
 
-  override def findByObjectName(objectName: String, path: Option[String]): Future[FileS3Object] = {
+  override def findByObjectName(objectName: String, path: Option[String])(implicit
+      requestHeader: RequestHeader
+  ): Future[FileS3Object] = {
 
     val cleanPath: String = getCleanPath(path)
 
@@ -118,11 +124,13 @@ class S3FileStorageService @Inject() (
     case Failure(e) =>
       val hint = new Hint
       hint.set("objectName", objectName)
-      Sentry.captureException(e, hint)
+      sentryExtended.captureExceptionWithHint(e, hint)
       Future.failed(e)
   }
 
-  override def deleteByObjectName(objectName: String, path: Option[String]): Future[Boolean] =
+  override def deleteByObjectName(objectName: String, path: Option[String])(implicit
+      requestHeader: RequestHeader
+  ): Future[Boolean] =
     S3.deleteObject(
       bucket = bucketName,
       key    = objectName
@@ -133,7 +141,7 @@ class S3FileStorageService @Inject() (
         case Failure(e) =>
           val hint = new Hint
           hint.set("objectName", objectName)
-          Sentry.captureException(e, hint)
+          sentryExtended.captureExceptionWithHint(e, hint)
           Future.successful(false)
       }
 
@@ -195,13 +203,13 @@ class S3FileStorageService @Inject() (
       }
     }
 
-  override def getList(path: Option[String]): Future[List[String]] =
+  override def getList(path: Option[String])(implicit requestHeader: RequestHeader): Future[List[String]] =
     filesStream(path)
       .toMat(Sink.seq)(Keep.right)
       .run()
       .map(_.toList)
       .recoverWith { case e: Throwable =>
-        Sentry.captureException(e)
+        sentryExtended.captureException(e)
         Future.successful(List.empty[String])
       }
 
