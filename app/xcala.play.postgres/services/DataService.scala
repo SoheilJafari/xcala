@@ -225,7 +225,9 @@ trait DataRemoveServiceImpl[Id, Entity <: EntityWithId[Id]]
     with DataRemoveService[Id, Entity] {
   import tableDefinition.profile.api._
 
-  def delete(id: Id): Future[Int] = {
+  def delete(id: Id)(
+      implicit requestHeader: RequestHeader
+  ): Future[Int] = {
     val action = filterQueryById(id).delete
     db.run(action)
   }
