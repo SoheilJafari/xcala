@@ -2,10 +2,23 @@ package xcala.play.postgres.utils
 
 import xcala.play.models._
 import xcala.play.models.SortOptionsBase
+import xcala.play.postgres.models.TableWithId
+
+import scala.language.implicitConversions
 
 import slick.lifted._
 
 object QueryHelpers {
+
+  implicit def singleRepColumnOrderedConversion[T](rep: Rep[T]): Seq[ColumnOrdered[_]] =
+    Seq(ColumnOrdered(rep, slick.ast.Ordering()))
+
+  implicit class RepExtraIdExtension[T, E <: TableWithId[_]](rep: Rep[T])(implicit e: E) {
+
+    def withExtraId: Seq[ColumnOrdered[_]] =
+      Seq(ColumnOrdered(e.id, slick.ast.Ordering()), ColumnOrdered(rep, slick.ast.Ordering()))
+
+  }
 
   implicit class RichQuery[E, U, C[_]](val query: Query[E, U, C]) extends AnyVal {
 
@@ -47,14 +60,6 @@ object QueryHelpers {
     }
 
     def multiSortPaginated[V <: Enumeration](
-        queryOptions   : QueryOptions,
-        sortEnumeration: V
-    )(
-        f: E => sortEnumeration.Value => ColumnOrdered[_]
-    ): Query[E, U, C] =
-      multiSort(queryOptions, sortEnumeration)(f.andThen(_.andThen(Seq(_)))).paginated(queryOptions)
-
-    def multiSortPaginated2[V <: Enumeration](
         queryOptions   : QueryOptions,
         sortEnumeration: V
     )(
