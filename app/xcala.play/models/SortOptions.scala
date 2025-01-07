@@ -33,12 +33,14 @@ abstract class SortOptionsBase[A <: SortOptionsBase[_]](val sortExpression: Opti
               }
             case Some(sortInfo) if sortInfo.direction == -1 =>
               // Remove sort info if it was descending
-              sortInfos.filter(_ != sortInfo)
+              sortInfos.filterNot(si => (si == sortInfo) || (addIdToSort && si.field == "_id"))
             case _ =>
               // Add new one if not exists
               sortInfos :+ SortInfo(sort)
           }
-        } ++ { if (addIdToSort) Seq(SortInfo("_id")) else Nil }
+        } ++ {
+          if (addIdToSort && !sortInfos.exists(_.field == "_id")) Seq(SortInfo("_id")) else Nil
+        }
 
         resetSort(sortExpression = Some(newSortInfos.mkString(",")), resetPagination)
     }
