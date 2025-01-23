@@ -17,12 +17,12 @@ object KeywordExtractor {
   }
 
   def removeSpecialCharacters(text: String): String = {
-    val withSpace = breaks.replaceAllIn(text.toLowerCase(), " ")
+    val withSpace = breaks.replaceAllIn(text, " ")
     withSpace.trim.replaceAll(" +", " ")
   }
 
   def removeTicketSpecialCharacters(text: String): String = {
-    val withSpace = ticketBreaks.replaceAllIn(text.toLowerCase(), " ")
+    val withSpace = ticketBreaks.replaceAllIn(text, " ")
     withSpace.trim.replaceAll(" +", " ")
   }
 
