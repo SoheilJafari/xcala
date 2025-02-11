@@ -6,7 +6,7 @@
 </div>
 
 @maybeCreateCall.map { createCall =>
-<div class="pull-left" style="margin-top: -15px">
+<div class="pull-left" style="margin-top: -15px;position: absolute;">
     <a href=@createCall.paginatedUrl(paginated) class='btn btn-default'>@Messages("new")</a>
 </div>
 }
