@@ -313,7 +313,7 @@ private[controllers] trait FileControllerBase
 
   }
 
-  protected def renderFile(file: FileInfoService.FileObject, dispositionMode: String): Result =
+  def renderFile(file: FileInfoService.FileObject, dispositionMode: String): Result =
     renderInputStream(
       inputStream     = file.content,
       contentLength   = file.contentLength,
