@@ -1,0 +1,14 @@
+@(label: String, labelDivSize: Int = 4, copyToClipboardValue: Option[String] = None, style: Option[String] = None, isLabelHtml: Boolean = false)(value: Html)(implicit messages: Messages)
+<div class="form-group">
+	<label class="col-sm-@labelDivSize control-label">@if(isLabelHtml){@Messages(label)}else{@Html(Messages(label))}</label>
+	<div class="col-sm-@(12 - labelDivSize)">
+		<p class="form-control-static"  @style.map(s=>Html(s"style='$s'"))>
+			@value
+			
+
+			@copyToClipboardValue.map { clipboardValue =>
+			<span class="clipboard fa fa-copy" data-clipboard-text="@clipboardValue"></span>
+			}
+		</p>
+	</div>
+</div>
