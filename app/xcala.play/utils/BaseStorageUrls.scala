@@ -24,7 +24,8 @@ object BaseStorageUrls {
     ): Call
 
     def protectedFileUrl(
-        id: BSONObjectID
+        id                 : BSONObjectID,
+        userDefinedFileName: Option[String] = None
     ): Call
 
   }
@@ -45,7 +46,7 @@ object BaseStorageUrls {
         expireTime: Long
     ): Call
 
-    def protectedImageUrl(
+    override def protectedImageUrl(
         id    : BSONObjectID,
         width : Option[Int] = None,
         height: Option[Int] = None
@@ -64,19 +65,26 @@ object BaseStorageUrls {
     }
 
     protected def protectedFileUrl(
-        id        : BSONObjectID,
-        signature : String,
-        expireTime: Long
+        id                 : BSONObjectID,
+        signature          : String,
+        expireTime         : Long,
+        userDefinedFileName: Option[String]
     ): Call
 
-    def protectedFileUrl(
-        id: BSONObjectID
+    override def protectedFileUrl(
+        id                 : BSONObjectID,
+        userDefinedFileName: Option[String] = None
     ): Call = {
       val minutesToBeExpiredAfter =
         configuration.get[Int]("fileStorage.s3.timeLimitedUrl.urlToBeExpiredAfterMinutes")
       val expireTime = DateTime.now().plusMinutes(minutesToBeExpiredAfter)
       val signature: String = ProtectedFileSignatureParameters(id, expireTime).signature
-      protectedFileUrl(id = id, signature = signature, expireTime = expireTime.getMillis)
+      protectedFileUrl(
+        id                  = id,
+        signature           = signature,
+        expireTime          = expireTime.getMillis,
+        userDefinedFileName = userDefinedFileName
+      )
     }
 
   }
@@ -91,7 +99,8 @@ object BaseStorageUrls {
     ): Call
 
     def publicFileUrl(
-        id: BSONObjectID
+        id                 : BSONObjectID,
+        userDefinedFileName: Option[String] = None
     ): Call
 
   }
@@ -108,26 +117,38 @@ object BaseStorageUrls {
         extension: Option[String]
     ): Call
 
-    def publicImageUrl(
+    override def publicImageUrl(
         id       : BSONObjectID,
         width    : Option[Int]    = None,
         height   : Option[Int]    = None,
         extension: Option[String] = None
     ): Call = {
       val signature: String = PublicImageSignatureParameters(id).signature
-      publicImageUrl(id = id, signature = signature, width = width, height = height, extension = extension)
+      publicImageUrl(
+        id        = id,
+        signature = signature,
+        width     = width,
+        height    = height,
+        extension = extension
+      )
     }
 
     protected def publicFileUrl(
-        id       : BSONObjectID,
-        signature: String
+        id                 : BSONObjectID,
+        signature          : String,
+        userDefinedFileName: Option[String]
     ): Call
 
-    def publicFileUrl(
-        id: BSONObjectID
+    override def publicFileUrl(
+        id                 : BSONObjectID,
+        userDefinedFileName: Option[String] = None
     ): Call = {
       val signature: String = PublicFileSignatureParameters(id).signature
-      publicFileUrl(id, signature)
+      publicFileUrl(
+        id                  = id,
+        signature           = signature,
+        userDefinedFileName = userDefinedFileName
+      )
     }
 
   }
