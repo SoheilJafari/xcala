@@ -322,13 +322,25 @@ private[controllers] trait FileControllerBase
       dispositionMode = dispositionMode
     )
 
-  protected def renderFile(id: BSONObjectID, dispositionMode: String)(implicit
-      requestHeader: RequestHeader
+  protected def renderFile(
+      id                      : BSONObjectID,
+      dispositionMode         : String,
+      maybeUserDefinedFileName: Option[String]
+  )(
+      implicit requestHeader: RequestHeader
   ): Future[Result] = {
     fileInfoService.findObjectById(id).transform {
 
       case Success(file) =>
-        Success(renderFile(file, dispositionMode))
+        val renamedFile =
+          maybeUserDefinedFileName match {
+            case None =>
+              file
+            case Some(userDefinedFileName) =>
+              file.withUserDefinedName(userDefinedFileName)
+
+          }
+        Success(renderFile(renamedFile, dispositionMode))
 
       case Failure(e) =>
         e match {

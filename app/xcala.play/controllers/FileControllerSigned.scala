@@ -161,10 +161,11 @@ trait FileControllerSigned extends FileControllerBase {
     }
 
   private def getFile(
-      unverifiedId   : BSONObjectID,
-      signature      : String,
-      protectedAccess: Boolean,
-      expireTime     : Option[DateTime]
+      unverifiedId            : BSONObjectID,
+      signature               : String,
+      protectedAccess         : Boolean,
+      expireTime              : Option[DateTime],
+      maybeUserDefinedFileName: Option[String]
   ): Action[AnyContent] =
     fileProtectionCheck(
       expectedToBeProtected = protectedAccess,
@@ -174,7 +175,11 @@ trait FileControllerSigned extends FileControllerBase {
       unverifiedId
     ) { verifiedId =>
       (if (protectedAccess) protectedAction else Action).async { implicit request =>
-        renderFile(verifiedId, CONTENT_DISPOSITION_ATTACHMENT)
+        renderFile(
+          id                       = verifiedId,
+          dispositionMode          = CONTENT_DISPOSITION_ATTACHMENT,
+          maybeUserDefinedFileName = maybeUserDefinedFileName
+        )
       }
     }
 
@@ -195,15 +200,17 @@ trait FileControllerSigned extends FileControllerBase {
     )
 
   def getProtectedFile(
-      id        : BSONObjectID,
-      signature : String,
-      expireTime: Long
+      id                      : BSONObjectID,
+      signature               : String,
+      expireTime              : Long,
+      maybeUserDefinedFileName: Option[String]
   ): Action[AnyContent] =
     getFile(
-      unverifiedId    = id,
-      signature       = signature,
-      protectedAccess = true,
-      expireTime      = Some(new DateTime(expireTime))
+      unverifiedId             = id,
+      signature                = signature,
+      protectedAccess          = true,
+      expireTime               = Some(new DateTime(expireTime)),
+      maybeUserDefinedFileName = maybeUserDefinedFileName
     )
 
   def getPublicImage(
@@ -250,14 +257,16 @@ trait FileControllerSigned extends FileControllerBase {
     )
 
   def getPublicFile(
-      id       : BSONObjectID,
-      signature: String
+      id                      : BSONObjectID,
+      signature               : String,
+      maybeUserDefinedFileName: Option[String]
   ): Action[AnyContent] =
     getFile(
-      unverifiedId    = id,
-      signature       = signature,
-      protectedAccess = false,
-      expireTime      = None
+      unverifiedId             = id,
+      signature                = signature,
+      protectedAccess          = false,
+      expireTime               = None,
+      maybeUserDefinedFileName = maybeUserDefinedFileName
     )
 
 }

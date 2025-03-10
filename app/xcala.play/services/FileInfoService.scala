@@ -33,7 +33,12 @@ object FileInfoService {
       contentLength: Option[Long]
   ) {
 
-    def isImage: Boolean = contentType.exists(_.startsWith("image/"))
+    def isImage: Boolean =
+      contentType.exists(_.startsWith("image/"))
+
+    def withUserDefinedName(newName: String): FileObject =
+      this.copy(name = newName + "." + name.split("\\.").takeRight(1).mkString)
+
   }
 
 }

@@ -102,9 +102,16 @@ trait FileControllerUnsigned extends FileControllerBase {
 
   }
 
-  def getFile(id: BSONObjectID): Action[AnyContent] =
+  def getFile(
+      id                      : BSONObjectID,
+      maybeUserDefinedFileName: Option[String]
+  ): Action[AnyContent] =
     Action.async { implicit request =>
-      renderFile(id, CONTENT_DISPOSITION_ATTACHMENT)
+      renderFile(
+        id                       = id,
+        dispositionMode          = CONTENT_DISPOSITION_ATTACHMENT,
+        maybeUserDefinedFileName = maybeUserDefinedFileName
+      )
     }
 
 }
