@@ -23,9 +23,7 @@
 	@rows.map { case (row, attributes) =>
 		<tr @attributes.map{ case (k, v)=> @k=@{v}}>
 			@row.map { case (_, value, css) =>
-				<td@css.map(c => Html(s" class='${c}'"))>
-					@Html(value)
-				</td>
+				<td@css.map(c => Html(s" class='${c}'"))>@Html(value)</td>			
 			}
 		</tr> 
 	}
