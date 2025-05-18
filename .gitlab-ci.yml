@@ -7,7 +7,7 @@ variables:
   IMAGE_USER: ketab
 
 xcala_play_build:
-  image: hub.hamdocker.ir/library/docker:24.0.4
+  image: hub.hamdocker.ir/library/docker:28.1.1
   script:
     - docker login -u "$REGISTRY_USER" -p "$REGISTRY_PASSWORD" $REGISTRY
     - docker build --build-arg NEXUS_KEY .
@@ -31,6 +31,9 @@ xcala_play_test:
 
 xcala_play_publish:
   image: registry.hamdocker.ir/ketab/xcala-play-test:$CI_COMMIT_SHORT_SHA
+  only:
+    refs:
+      - master
   script:
     - cd /opt
     - sbt -Dci=true publish

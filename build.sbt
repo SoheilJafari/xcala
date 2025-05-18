@@ -2,11 +2,11 @@ name := """xcala.play"""
 
 organization := "com.xcala"
 
-version := "1.12.16"
+version := "1.12.17"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
-scalaVersion := "2.13.15"
+scalaVersion := "2.13.16"
 
 resolvers ++=
   Seq(
@@ -43,27 +43,28 @@ libraryDependencies ++=
     "com.typesafe.akka"            %% "akka-slf4j"                 % "2.8.6",
     "com.bahmanm"                  %% "persianutils"               % "5.0",
     "io.lemonlabs"                 %% "scala-uri"                  % "4.0.3",
-    "org.apache.tika"               % "tika-core"                  % "3.0.0",
-    "io.sentry"                     % "sentry-logback"             % "7.18.0",
-    "io.minio"                      % "minio"                      % "8.5.12",
-    "commons-io"                    % "commons-io"                 % "2.17.0",
-    "com.sksamuel.scrimage"        %% "scrimage-scala"             % "4.2.0",
-    "com.sksamuel.scrimage"         % "scrimage-webp"              % "4.2.0",
-    "com.fasterxml.jackson.module" %% "jackson-module-scala"       % "2.18.1",
-    "org.postgresql"                % "postgresql"                 % "42.7.4",
     "com.typesafe.play"            %% "play-slick"                 % "5.2.0",
     "com.github.tototoshi"         %% "slick-joda-mapper"          % "2.9.1",
     "com.github.tminglei"          %% "slick-pg"                   % "0.21.1",
     "com.lightbend.akka"           %% "akka-stream-alpakka-slick"  % "6.0.2",
     "com.lightbend.akka"           %% "akka-stream-alpakka-s3"     % "6.0.2",
-    "software.amazon.awssdk"        % "s3"                         % "2.29.10",
-    "com.ibm.icu"                   % "icu4j"                      % "76.1",
+    "com.fasterxml.jackson.module" %% "jackson-module-scala"       % "2.19.0",
     "com.typesafe.play"            %% "play-json"                  % "2.10.6",
     "com.typesafe.play"            %% "play-json-joda"             % "2.10.6",
+    "com.sksamuel.scrimage"        %% "scrimage-scala"             % "4.3.1",
+    "com.sksamuel.scrimage"         % "scrimage-webp"              % "4.3.1",
+    "org.apache.logging.log4j"      % "log4j-to-slf4j"             % "2.24.3",
+    "org.apache.tika"               % "tika-core"                  % "3.1.0",
+    "io.sentry"                     % "sentry-logback"             % "8.12.0",
+    "io.minio"                      % "minio"                      % "8.5.17",
+    "commons-io"                    % "commons-io"                 % "2.19.0",
+    "org.postgresql"                % "postgresql"                 % "42.7.5",
+    "software.amazon.awssdk"        % "s3"                         % "2.31.44",
+    "com.ibm.icu"                   % "icu4j"                      % "77.1",
     specs2                          % Test
   )
 
-ThisBuild / scapegoatVersion := "3.1.2"
+ThisBuild / scapegoatVersion := "3.1.9"
 
 scapegoatIgnoredFiles :=
   Seq(
@@ -126,7 +127,7 @@ Test / javaOptions ++= Seq("--add-opens=java.base/java.lang=ALL-UNNAMED")
 if (sys.props.getOrElse("ci", "") != "true") {
   new Def.SettingList(
     Seq(
-      addCompilerPlugin("org.scalameta" % "semanticdb-scalac" % "4.11.2" cross CrossVersion.full),
+      addCompilerPlugin("org.scalameta" % "semanticdb-scalac" % "4.13.6" cross CrossVersion.full),
       scalacOptions ++=
         List(
           "-Yrangepos",
