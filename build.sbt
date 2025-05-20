@@ -2,7 +2,7 @@ name := """xcala.play"""
 
 organization := "com.xcala"
 
-version := "1.12.17"
+version := "1.12.18"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
@@ -61,6 +61,7 @@ libraryDependencies ++=
     "org.postgresql"                % "postgresql"                 % "42.7.5",
     "software.amazon.awssdk"        % "s3"                         % "2.31.44",
     "com.ibm.icu"                   % "icu4j"                      % "77.1",
+    "io.github.jyllands-posten"    %% "play-prometheus-filters"    % "0.6.2-SNAPSHOT",
     specs2                          % Test
   )
 
