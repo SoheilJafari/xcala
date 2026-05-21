@@ -2,7 +2,7 @@ name := """xcala.play"""
 
 organization := "com.xcala"
 
-version := "1.12.18"
+version := "1.12.19"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
@@ -10,18 +10,18 @@ scalaVersion := "2.13.16"
 
 resolvers ++=
   Seq(
-    "Sonatype Nexus Repository Manager".at("https://nexus.darkube.app/repository/ajor-maven/")
+    "Sonatype Nexus Repository Manager".at("https://nexus.icfi.ir/repository/ajor-maven/")
   )
 
 publishTo :=
   Some(
-    "Sonatype Nexus Repository Manager".at("https://nexus.darkube.app/repository/ajor-maven/")
+    "Sonatype Nexus Repository Manager".at("https://nexus.icfi.ir/repository/ajor-maven/")
   )
 
 credentials +=
   Credentials(
     "Sonatype Nexus Repository Manager",
-    "nexus.darkube.app",
+    "nexus.icfi.ir",
     "ci",
     System.getenv.get("NEXUS_KEY")
   )
@@ -64,6 +64,8 @@ libraryDependencies ++=
     "io.github.jyllands-posten"    %% "play-prometheus-filters"    % "0.6.2-SNAPSHOT",
     specs2                          % Test
   )
+
+ThisBuild / versionScheme := Some("early-semver")
 
 ThisBuild / scapegoatVersion := "3.1.9"
 
@@ -119,8 +121,8 @@ scalacOptions ++=
     "-Wconf:cat=unused-imports&site=router:s"          // Silence import warnings on Play `routes` files
   )
 
-publishConfiguration      := publishConfiguration.value.withOverwrite(true)
-publishLocalConfiguration := publishLocalConfiguration.value.withOverwrite(true)
+//publishConfiguration      := publishConfiguration.value.withOverwrite(true)
+//publishLocalConfiguration := publishLocalConfiguration.value.withOverwrite(true)
 
 Test / javaOptions ++= Seq("--add-opens=java.base/java.lang=ALL-UNNAMED")
 
