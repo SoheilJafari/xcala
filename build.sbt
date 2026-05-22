@@ -59,7 +59,7 @@ libraryDependencies ++=
     "io.minio"                      % "minio"                      % "8.5.17",
     "commons-io"                    % "commons-io"                 % "2.22.0",
     "org.postgresql"                % "postgresql"                 % "42.7.11",
-    "software.amazon.awssdk"        % "s3"                         % "2.44.10",
+    "software.amazon.awssdk"        % "s3"                         % "2.43.1",
     "com.ibm.icu"                   % "icu4j"                      % "78.3",
     "io.github.jyllands-posten"    %% "play-prometheus-filters"    % "0.6.2-SNAPSHOT",
     specs2                          % Test
