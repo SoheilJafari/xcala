@@ -7,9 +7,9 @@ variables:
   IMAGE_USER: ketab
 
 xcala_play_build:
-  image: hub.hamdocker.ir/library/docker:28.1.1
+  image: hub.hamdocker.ir/library/docker:29.5.3
   script:
-    - docker login -u "$REGISTRY_USER" -p "$REGISTRY_PASSWORD" $REGISTRY
+    - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin $REGISTRY
     - docker build --build-arg NEXUS_KEY .
     - export IMAGE="registry.hamdocker.ir/ketab/xcala-play-test"
     - docker build --build-arg NEXUS_KEY -t $IMAGE:$CI_COMMIT_SHORT_SHA  -t $IMAGE:$CI_COMMIT_REF_SLUG --target builder .

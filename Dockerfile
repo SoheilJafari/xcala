@@ -9,7 +9,7 @@ RUN update_credentials
 WORKDIR         /opt
 ADD project     /opt/project
 ADD build.sbt   /opt/
-RUN sbt -Dci=true clean update updateClassifiers
+RUN sbt -Dci=true clean update
 
 # Prepare build
 ADD app     /opt/app
