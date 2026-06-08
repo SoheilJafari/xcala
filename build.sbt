@@ -10,18 +10,18 @@ scalaVersion := "2.13.16"
 
 resolvers ++=
   Seq(
-    "Sonatype Nexus Repository Manager".at("https://nexus.icfi.ir/repository/ajor-maven/")
+    "Sonatype Nexus Repository Manager".at("https://nexuss.darkube.ir/repository/ajor-maven/")
   )
 
 publishTo :=
   Some(
-    "Sonatype Nexus Repository Manager".at("https://nexus.icfi.ir/repository/ajor-maven/")
+    "Sonatype Nexus Repository Manager".at("https://nexuss.darkube.ir/repository/ajor-maven/")
   )
 
 credentials +=
   Credentials(
     "Sonatype Nexus Repository Manager",
-    "nexus.icfi.ir",
+    "nexuss.darkube.ir",
     "ci",
     System.getenv.get("NEXUS_KEY")
   )
